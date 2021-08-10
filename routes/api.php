@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 */
 Route::resource('address','App\Http\Controllers\AddressController');
 
+Route::resource('patient','App\Http\Controllers\PatientController');
+
 
 
 
