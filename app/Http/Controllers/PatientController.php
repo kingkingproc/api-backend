@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Patient;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
@@ -14,6 +15,7 @@ class PatientController extends Controller
     public function index()
     {
         //
+        return patient::all();
     }
 
     /**
@@ -25,6 +27,7 @@ class PatientController extends Controller
     public function store(Request $request)
     {
         //
+        return patient::create($request->all());
     }
 
     /**
@@ -33,9 +36,11 @@ class PatientController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(patient $patient)
     {
         //
+        return $patient;
+        
     }
 
     /**
