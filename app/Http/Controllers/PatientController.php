@@ -50,9 +50,12 @@ class PatientController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, patient $patient)
     {
         //
+        $patient = patient::find($patient->id);
+        $patient->update($request->all());
+        return $patient;
     }
 
     /**
@@ -61,8 +64,9 @@ class PatientController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(patient $patient)
     {
         //
+        return patient::destroy($patient->id);
     }
 }
