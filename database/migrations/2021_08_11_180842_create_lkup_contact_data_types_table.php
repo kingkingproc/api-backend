@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePatientContactsTable extends Migration
+class CreateLkupContactDataTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreatePatientContactsTable extends Migration
      */
     public function up()
     {
-        Schema::create('patient_contacts', function (Blueprint $table) {
+        Schema::create('lkup_contact_data_types', function (Blueprint $table) {
             $table->id();
-            $table->string('contact_name');
-            $table->integer('patient_id');
-            $table->integer('address_id');
-            $table->integer('contact_type_id');
+            $table->string('contact_data_type');
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ class CreatePatientContactsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('patient_contacts');
+        Schema::dropIfExists('lkup_contact_data_types');
     }
 }

@@ -12,15 +12,13 @@ class Patient extends Model
     protected $fillable = [
         'email',
         'type',
-        'password',
+        'sub',
         'name_first',
         'name_middle',
         'name_last',
         'dob',
         'sex',
         'ethnicity',
-        'primary_contact_id',
-        'secondary_contact_id',
         'address_id'
     ];
 }

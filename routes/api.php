@@ -28,6 +28,12 @@ Route::resource('patientdiagnosisadditional','App\Http\Controllers\PatientDiagno
 
 Route::resource('patientdiagnosisremotesite','App\Http\Controllers\PatientDiagnosisRemoteSiteController');
 
+Route::resource('patientcontactdata','App\Http\Controllers\PatientContactDataController');
+
+Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeController');
+
+
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

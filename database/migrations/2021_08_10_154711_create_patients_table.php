@@ -17,15 +17,13 @@ class CreatePatientsTable extends Migration
             $table->id();
             $table->string('email');
             $table->integer('type')->nullable();
-            $table->string('password');
+            $table->string('sub');
             $table->string('name_first');
             $table->string('name_middle')->nullable();
             $table->string('name_last')->nullable();
             $table->date('dob')->nullable();
             $table->string('sex')->nullable();
             $table->string('ethnicity')->nullable();
-            $table->integer('primary_contact_id')->nullable();
-            $table->integer('secondary_contact_id')->nullable();
             $table->integer('address_id')->nullable();
             $table->timestamps();
         });
