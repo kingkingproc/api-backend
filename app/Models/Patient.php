@@ -21,4 +21,9 @@ class Patient extends Model
         'ethnicity',
         'address_id'
     ];
+
+    function getPatientContacts() {
+
+        return $this->hasMany('App\Models\PatientContact');
+    }
 }

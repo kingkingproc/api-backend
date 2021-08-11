@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class address extends Model
 {
     
-
+    use HasFactory;
     protected $fillable = [
         'address_1',
         'address_2',
@@ -18,5 +18,7 @@ class address extends Model
         'address_country'
     ];
 
-    use HasFactory;
+
+
+    
 }

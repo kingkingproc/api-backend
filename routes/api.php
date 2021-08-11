@@ -32,6 +32,8 @@ Route::resource('patientcontactdata','App\Http\Controllers\PatientContactDataCon
 
 Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeController');
 
+Route::resource('patientfull','App\Http\Controllers\PatientFullController');
+
 
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
