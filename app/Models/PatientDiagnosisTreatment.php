@@ -10,7 +10,6 @@ class PatientDiagnosisTreatment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'treatment_id',
         'treatment_label'
     ];
 }

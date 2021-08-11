@@ -15,7 +15,6 @@ class CreateLkupContactTypesTable extends Migration
     {
         Schema::create('lkup_contact_types', function (Blueprint $table) {
             $table->id();
-            $table->integer('contact_type_id');
             $table->string('contact_type');
             $table->timestamps();
         });

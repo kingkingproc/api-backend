@@ -24,9 +24,9 @@ Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeControlle
 
 Route::resource('patientdiagnosistreatment','App\Http\Controllers\PatientDiagnosisTreatmentController');
 
+Route::resource('patientdiagnosisadditional','App\Http\Controllers\PatientDiagnosisAdditionalController');
 
-
-
+Route::resource('patientdiagnosisremotesite','App\Http\Controllers\PatientDiagnosisRemoteSiteController');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

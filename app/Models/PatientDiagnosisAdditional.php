@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LkupContactType extends Model
+class PatientDiagnosisAdditional extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'contact_type'
-    ];
+        'additional_label'
+    ]
 }

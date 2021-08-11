@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePatientDiagnosisTreatmentsTable extends Migration
+class CreatePatientDiagnosisRemoteSitesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreatePatientDiagnosisTreatmentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('patient_diagnosis_treatments', function (Blueprint $table) {
+        Schema::create('patient_diagnosis_remote_sites', function (Blueprint $table) {
             $table->id();
-            $table->string('treatment_label');
+            $table->string('remote_site_label');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ class CreatePatientDiagnosisTreatmentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('patient_diagnosis_treatments');
+        Schema::dropIfExists('patient_diagnosis_remote_sites');
     }
 }
