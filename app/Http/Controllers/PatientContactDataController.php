@@ -27,6 +27,7 @@ class PatientContactDataController extends Controller
     public function store(Request $request)
     {
         //
+        return patientcontactdata::create($request->all());
     }
 
     /**
@@ -52,6 +53,9 @@ class PatientContactDataController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $patientcontactdata = patientcontactdata::find($id);
+        $patientcontactdata->update($request->all());
+        return $patientcontactdata;
     }
 
     /**
@@ -63,5 +67,6 @@ class PatientContactDataController extends Controller
     public function destroy($id)
     {
         //
+        return patientcontactdata::destroy($id);
     }
 }
