@@ -9,9 +9,9 @@ class PatientContact extends Model
 {
     use HasFactory;
 
-    protected $fillable[
+    protected $fillable = [
         'contact_name',
         'contact_data',
         'contact_type_id'
-    ]
+    ];
 }

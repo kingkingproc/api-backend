@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PatientContact;
 use Illuminate\Http\Request;
 
 class PatientContactController extends Controller
@@ -48,10 +49,10 @@ class PatientContactController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $patientcontact)
+    public function update(Request $request, $id)
     {
         //
-        $patientcontact = patientcontact::find($patientcontact->id);
+        $patientcontact = patientcontact::find($id);
         $patientcontact->update($request->all());
         return $patientcontact;
     }
@@ -62,9 +63,9 @@ class PatientContactController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($patientcontact)
+    public function destroy($id)
     {
         //
-        return patientcontact::destroy($patientcontact->id);
+        return patientcontact::destroy($id);
     }
 }
