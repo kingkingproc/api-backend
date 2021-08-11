@@ -18,6 +18,8 @@ Route::resource('address','App\Http\Controllers\AddressController');
 
 Route::resource('patient','App\Http\Controllers\PatientController');
 
+Route::resource('patientcontact','App\Http\Controllers\PatientContactController');
+
 
 
 
