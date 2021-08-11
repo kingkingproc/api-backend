@@ -20,6 +20,10 @@ Route::resource('patient','App\Http\Controllers\PatientController');
 
 Route::resource('patientcontact','App\Http\Controllers\PatientContactController');
 
+Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeController');
+
+Route::resource('patientdiagnosistreatment','App\Http\Controllers\PatientDiagnosisTreatmentController');
+
 
 
 
