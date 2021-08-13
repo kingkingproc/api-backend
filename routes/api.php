@@ -34,7 +34,7 @@ Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeC
 
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 
-
+Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController');
 
 Route::resource('patientdiagnosiscancerstage','App\Http\Controllers\PatientDiagnosisCancerStageController');
 Route::resource('patientdiagnosiscancertype','App\Http\Controllers\PatientDiagnosisCancerTypeController');
