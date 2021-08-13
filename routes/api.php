@@ -36,6 +36,7 @@ Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 
 
 
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

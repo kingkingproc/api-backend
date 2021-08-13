@@ -15,4 +15,6 @@ class PatientContact extends Model
         'address_id',
         'contact_type_id'
     ];
+
+
 }

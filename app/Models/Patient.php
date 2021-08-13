@@ -26,4 +26,21 @@ class Patient extends Model
 
         return $this->hasMany('App\Models\PatientContact');
     }
+
+    function getAddresses() {
+
+        return $this->belongsTo('App\Models\address', 'address_id', 'id');
+    }
+
+    /*
+    function getPatientContactData() {
+        $contacts = $this->hasMany('App\Models\PatientContact');
+        //$contacts = json_decode($contacts);
+        //foreach($contacts as $contact) {
+        //    $array[] = $contact->hasMany('App\Models\PatientContactData');
+        //}
+        return $contacts->hasMany('App\Models\PatientContactData');;
+    }
+        */
+    
 }
