@@ -11,5 +11,5 @@ class PatientDiagnosisAdditional extends Model
 
     protected $fillable = [
         'additional_label'
-    ]
+    ];
 }

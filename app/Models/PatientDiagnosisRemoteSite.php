@@ -11,5 +11,5 @@ class PatientDiagnosisRemoteSite extends Model
 
     protected $fillable = [
         'remote_site_label'
-    ]
+    ];
 }
