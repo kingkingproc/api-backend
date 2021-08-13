@@ -36,6 +36,14 @@ Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 
 
 
+Route::resource('patientdiagnosiscancerstage','App\Http\Controllers\PatientDiagnosisCancerStageController');
+Route::resource('patientdiagnosiscancertype','App\Http\Controllers\PatientDiagnosisCancerTypeController');
+Route::resource('patientdiagnosiscelltype','App\Http\Controllers\PatientDiagnosisCellTypeController');
+Route::resource('patientdiagnosisperformancescore','App\Http\Controllers\PatientDiagnosisPerformanceScoreController');
+Route::resource('patientdiagnosistumorsite','App\Http\Controllers\PatientDiagnosisTumorSiteController');
+Route::resource('patientdiagnosistumorsize','App\Http\Controllers\PatientDiagnosisTumorSizeController');
+
+
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
