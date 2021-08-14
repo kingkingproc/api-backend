@@ -21,10 +21,11 @@ class PatientFullController extends Controller
             ->get(['patient_contact_data.id', 'patient_contact_data.contact_id', 'patient_contact_data.contact_data_type_id','patient_contact_data.contact_data']);
             
 
-        $json1 = Patient::find($id);
-        $json2 = Patient::find($id)->getAddresses;
-        $json3 = Patient::find($id)->getPatientContacts;
-        $json4 = json_encode($data);
+        $json1 = json_encode(['patient'=>Patient::find($id)]);
+        $json2 = json_encode(['patient_address'=>Patient::find($id)->getAddresses]);
+        $json3 = json_encode(['patient_contact'=>Patient::find($id)->getPatientContacts]);
+        $json4 = json_encode(['contact_data'=>$data]);
+
 
         $array[] = json_decode($json1, true);
         $array[] = json_decode($json2, true);
