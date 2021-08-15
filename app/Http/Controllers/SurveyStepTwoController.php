@@ -27,17 +27,6 @@ class SurveyStepTwoController extends Controller
     public function store(Request $request)
     {
         //
-        $request = $request->all();
-        foreach($request as $elem)  {
-            $array[] = $elem; 
-        }
-
-        $address = address::create($array[1]);
-
-        $patient = patient::find($id);
-        $patient->update($array[0]);
-
-        return $patient;
     }
 
     /**
