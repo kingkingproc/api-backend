@@ -15,39 +15,31 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::resource('address','App\Http\Controllers\AddressController');
-
 Route::resource('patient','App\Http\Controllers\PatientController');
 
-Route::resource('patientethnicity','App\Http\Controllers\PatientEthnicityController');
-
 Route::resource('patientcontact','App\Http\Controllers\PatientContactController');
-
-Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeController');
-
-Route::resource('patientdiagnosistreatment','App\Http\Controllers\PatientDiagnosisTreatmentController');
-
-Route::resource('patientdiagnosisadditional','App\Http\Controllers\PatientDiagnosisAdditionalController');
-
-Route::resource('patientdiagnosisremotesite','App\Http\Controllers\PatientDiagnosisRemoteSiteController');
-
 Route::resource('patientcontactdata','App\Http\Controllers\PatientContactDataController');
-
-Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeController');
-
-Route::resource('patientfull','App\Http\Controllers\PatientFullController');
+Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
 
 Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController');
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
 Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeController');
 
-Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
+Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 
-Route::resource('patientdiagnosiscancerstage','App\Http\Controllers\PatientDiagnosisCancerStageController');
-Route::resource('patientdiagnosiscancertype','App\Http\Controllers\PatientDiagnosisCancerTypeController');
-Route::resource('patientdiagnosiscelltype','App\Http\Controllers\PatientDiagnosisCellTypeController');
-Route::resource('patientdiagnosisperformancescore','App\Http\Controllers\PatientDiagnosisPerformanceScoreController');
-Route::resource('patientdiagnosistumorsite','App\Http\Controllers\PatientDiagnosisTumorSiteController');
-Route::resource('patientdiagnosistumorsize','App\Http\Controllers\PatientDiagnosisTumorSizeController');
+Route::resource('lkuppatientethnicity','App\Http\Controllers\LkupPatientEthnicityController');
+Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeController');
+Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeController');
+
+Route::resource('lkuppatientdiagnosistreatment','App\Http\Controllers\LkupPatientDiagnosisTreatmentController');
+Route::resource('lkuppatientdiagnosisadditional','App\Http\Controllers\LkupPatientDiagnosisAdditionalController');
+Route::resource('lkuppatientdiagnosisremotesite','App\Http\Controllers\LkupPatientDiagnosisRemoteSiteController');
+Route::resource('lkuppatientdiagnosiscancerstage','App\Http\Controllers\LkupPaitentDiagnosisCancerStageController');
+Route::resource('lkuppatientdiagnosiscancertype','App\Http\Controllers\LkupPaitentDiagnosisCancerTypeController');
+Route::resource('lkuppatientdiagnosiscelltype','App\Http\Controllers\LkupPaitentDiagnosisCellTypeController');
+Route::resource('lkuppatientdiagnosisscore','App\Http\Controllers\LkupPaitentDiagnosisPerformanceScoreController');
+Route::resource('lkuppatientdiagnosistumorsite','App\Http\Controllers\LkupPaitentDiagnosisTumorSiteController');
+Route::resource('lkuppatientdiagnosistumorsize','App\Http\Controllers\LkupPaitentDiagnosisTumorSizeController');
 
 
 

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePatientEthnicitiesTable extends Migration
+class CreateLkupPatientEthnicitiesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreatePatientEthnicitiesTable extends Migration
      */
     public function up()
     {
-        Schema::create('patient_ethnicities', function (Blueprint $table) {
-            $table->id();
+        Schema::create('lkup_patient_ethnicities', function (Blueprint $table) {
+            $table->bigIncrements('ethnicity_id');
             $table->string('ethnicity_label');
             $table->timestamps();
         });
@@ -27,6 +27,6 @@ class CreatePatientEthnicitiesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('patient_ethnicities');
+        Schema::dropIfExists('lkup_patient_ethnicities');
     }
 }

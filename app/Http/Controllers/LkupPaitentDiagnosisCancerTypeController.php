@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PatientEthnicity;
+use App\Models\LkupPatientDiagnosisCancerType;
 use Illuminate\Http\Request;
 
-class PatientEthnicityController extends Controller
+class LkupPaitentDiagnosisCancerTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +14,7 @@ class PatientEthnicityController extends Controller
      */
     public function index()
     {
-        return patientethnicity::all();
+        return lkuppatientdiagnosiscancertype::all();
     }
 
     /**
