@@ -18,6 +18,8 @@ Route::resource('address','App\Http\Controllers\AddressController');
 
 Route::resource('patient','App\Http\Controllers\PatientController');
 
+Route::resource('patientethnicity','App\Http\Controllers\PatientEthnicityController');
+
 Route::resource('patientcontact','App\Http\Controllers\PatientContactController');
 
 Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeController');
@@ -36,6 +38,9 @@ Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 
 Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController');
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
+Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeController');
+
+Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
 
 Route::resource('patientdiagnosiscancerstage','App\Http\Controllers\PatientDiagnosisCancerStageController');
 Route::resource('patientdiagnosiscancertype','App\Http\Controllers\PatientDiagnosisCancerTypeController');

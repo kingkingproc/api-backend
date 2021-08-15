@@ -18,6 +18,7 @@ class PatientFullController extends Controller
             ->join('patient_contact_data', 'patient_contact_data.contact_id', '=', 'patient_contacts.id')
             ->join('lkup_contact_data_types', 'lkup_contact_data_types.id', '=', 'patient_contact_data.contact_data_type_id')
             ->join('lkup_contact_types', 'lkup_contact_types.id', '=', 'patient_contacts.contact_type_id')
+            ->where('patients.id', $id)
             ->get(['patient_contact_data.id', 'patient_contact_data.contact_id', 'patient_contact_data.contact_data_type_id','patient_contact_data.contact_data']);
             
 
@@ -59,7 +60,7 @@ class PatientFullController extends Controller
        $patient = patient::find($array[0]["id"]);
        $patient->update($array[0]);
     
-       return $patient;
+       return json_encode(['patient'=>$patient]);
     }
 
 

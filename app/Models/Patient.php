@@ -18,8 +18,9 @@ class Patient extends Model
         'name_last',
         'dob',
         'sex',
-        'ethnicity',
-        'address_id'
+        'ethnicity_id',
+        'address_id',
+        'is_complete'
     ];
 
     function getPatientContacts() {

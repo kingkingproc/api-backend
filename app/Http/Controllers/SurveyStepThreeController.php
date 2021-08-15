@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SurveyStepOne;
+use App\Models\PatientDiagnosis;
 use Illuminate\Http\Request;
 
-class SurveyStepOneController extends Controller
+class SurveyStepThreeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,8 +25,7 @@ class SurveyStepOneController extends Controller
      */
     public function store(Request $request)
     {
-        return json_encode(['patient'=>surveystepone::create($request->all())]);
-
+        //
     }
 
     /**
@@ -50,6 +49,18 @@ class SurveyStepOneController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $request = $request->all();
+        foreach($request as $key => $value)  {
+            if ($key == 'additional_id') : $additional_array = $value;
+            elseif ($key == 'treatment_id') : $treatment_array = $value;
+            elseif ($key == 'cancer_type_id') : $int_cancer_type = $value;
+            elseif ($key == 'cancer_stage_id') : $int_cancer_stage = $value;
+        endif;
+        }
+        $patientdiagnosis_array = ['patient_id'=>$id,'cancer_type_id'=>$int_cancer_type,'stage_id'=>$int_cancer_stage];
+
+        $PatientDiagnosis = PatientDiagnosis::create($patientdiagnosis_array);
+        return $PatientDiagnosis->diagnosis_id;
     }
 
     /**

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SurveyStepOne;
+use App\Models\LkupPatientDiagnosisRemoteSite;
 use Illuminate\Http\Request;
 
-class SurveyStepOneController extends Controller
+class LkupPatientDiagnosisRemoteSiteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,8 +25,7 @@ class SurveyStepOneController extends Controller
      */
     public function store(Request $request)
     {
-        return json_encode(['patient'=>surveystepone::create($request->all())]);
-
+        return LkupPatientDiagnosisRemoteSite::create($request->all());
     }
 
     /**

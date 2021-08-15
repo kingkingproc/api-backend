@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SurveyStepOne;
+use App\Models\PatientDiagnosis;
 use Illuminate\Http\Request;
 
-class SurveyStepOneController extends Controller
+class PatientDiagnosisController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +14,7 @@ class SurveyStepOneController extends Controller
      */
     public function index()
     {
-        //
+        return patientdiagnosis::all();
     }
 
     /**
@@ -25,8 +25,7 @@ class SurveyStepOneController extends Controller
      */
     public function store(Request $request)
     {
-        return json_encode(['patient'=>surveystepone::create($request->all())]);
-
+        return patientdiagnosis::create($request->all());
     }
 
     /**
@@ -37,7 +36,8 @@ class SurveyStepOneController extends Controller
      */
     public function show($id)
     {
-        //
+        $patientdiagnosis = patientdiagnosis::find($id);
+        return $patientdiagnosis;
     }
 
     /**
@@ -49,7 +49,9 @@ class SurveyStepOneController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $patientdiagnosis = patientdiagnosis::find($id);
+        $patientdiagnosis->update($request->all());
+        return $patientdiagnosis;
     }
 
     /**
