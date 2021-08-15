@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\PatientDiagnosis;
+use App\Models\LkupPatientDiagnosisAdditional;
+use App\Models\LkupPatientDiagnosisTreatment;
 use Illuminate\Http\Request;
 
 class SurveyStepThreeController extends Controller
@@ -60,7 +62,23 @@ class SurveyStepThreeController extends Controller
         $patientdiagnosis_array = ['patient_id'=>$id,'cancer_type_id'=>$int_cancer_type,'stage_id'=>$int_cancer_stage];
 
         $PatientDiagnosis = PatientDiagnosis::create($patientdiagnosis_array);
-        return $PatientDiagnosis->diagnosis_id;
+        $PatientDiagnosisId = $PatientDiagnosis->diagnosis_id;
+
+        $array[] = $PatientDiagnosis;
+
+        foreach($additional_array as $add_id) {
+            $new_array = ['diagnosis_id'=>$id,'additional_id'=>$add_id];
+            $LkupPatientDiagnosisAdditional = LkupPatientDiagnosisAdditional::create($new_array);
+            $array[] = $LkupPatientDiagnosisAdditional;
+        }
+
+        foreach($treatment_array as $treat_id) {
+            $new_array = ['diagnosis_id'=>$id,'treatment_id'=>$treat_id];
+            $LkupPatientDiagnosisTreatment = LkupPatientDiagnosisTreatment::create($new_array);
+            $array[] = $LkupPatientDiagnosisTreatment;
+        }
+
+        return $array;
     }
 
     /**
