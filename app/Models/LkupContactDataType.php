@@ -9,6 +9,8 @@ class LkupContactDataType extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'contact_data_type_id';
+
     protected $fillable = [
         'contact_data_type'
     ];

@@ -19,18 +19,22 @@ Route::resource('patient','App\Http\Controllers\PatientController');
 
 Route::resource('patientcontact','App\Http\Controllers\PatientContactController');
 Route::resource('patientcontactdata','App\Http\Controllers\PatientContactDataController');
-Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
+Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeController');
+Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeController');
 
 Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController');
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
 Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeController');
 
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
+Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
+Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');
 
+
+
+
+// routes to lookup table, which have no creates or updates (for select form fields)
 Route::resource('lkuppatientethnicity','App\Http\Controllers\LkupPatientEthnicityController');
-Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeController');
-Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeController');
-
 Route::resource('lkuppatientdiagnosistreatment','App\Http\Controllers\LkupPatientDiagnosisTreatmentController');
 Route::resource('lkuppatientdiagnosisadditional','App\Http\Controllers\LkupPatientDiagnosisAdditionalController');
 Route::resource('lkuppatientdiagnosisremotesite','App\Http\Controllers\LkupPatientDiagnosisRemoteSiteController');

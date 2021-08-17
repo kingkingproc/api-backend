@@ -9,6 +9,8 @@ class PatientContact extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'contact_id';
+
     protected $fillable = [
         'contact_name',
         'patient_id',
@@ -16,5 +18,14 @@ class PatientContact extends Model
         'contact_type_id'
     ];
 
+    function getPatientContactType() {
+
+        return $this->hasOne('App\Models\LkupContactType', 'contact_type_id','contact_type_id');
+    }
+
+    function getPatientContactData() {
+
+        return $this->hasOne('App\Models\PatientContactData', 'contact_id', 'contact_id');
+    }
 
 }
