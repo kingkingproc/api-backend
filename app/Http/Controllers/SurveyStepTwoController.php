@@ -51,16 +51,15 @@ class SurveyStepTwoController extends Controller
     {
        //
        $request = $request->all();
-       foreach($request as $elem)  {
-           $array[] = $elem; 
-       }
 
-       $address = address::create($array[1]);
+       $patient_array = $request[0]["patient"];
+       $address_array = $request[1]["patient_address"];
 
-       $array[0]['address_id'] = $address->id;
+       $address = address::create($address_array);
 
+       $patient_array["address_id"] = $address->id;
        $patient = patient::find($id);
-       $patient->update($array[0]);
+       $patient->update($patient_array);
 
        
        return $patient;

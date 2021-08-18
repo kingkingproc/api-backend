@@ -25,8 +25,9 @@ class SurveyStepOneController extends Controller
      */
     public function store(Request $request)
     {
-        return json_encode(['patient'=>surveystepone::create($request->all())]);
-
+        $request = $request->all();
+        return json_encode(['patient'=>surveystepone::create($request['patient'])]);
+        
     }
 
     /**
