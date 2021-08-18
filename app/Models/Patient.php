@@ -33,6 +33,11 @@ class Patient extends Model
         return $this->belongsTo('App\Models\address', 'address_id', 'id');
     }
 
+    function getDiagnosis() {
+
+        return $this->hasOne('App\Models\PatientDiagnosis', 'patient_id', 'id');
+    }
+
     /*
     function getPatientContactData() {
         $contacts = $this->hasMany('App\Models\PatientContact');
