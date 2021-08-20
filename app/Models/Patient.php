@@ -32,12 +32,12 @@ class Patient extends Model
 
     function getAddresses() {
 
-        return $this->belongsTo('App\Models\address', 'address_id', 'id');
+        return $this->belongsTo('App\Models\address', 'address_id', 'address_id');
     }
 
     function getDiagnosis() {
 
-        return $this->hasOne('App\Models\PatientDiagnosis', 'patient_id', 'id');
+        return $this->hasOne('App\Models\PatientDiagnosis', 'patient_id', 'patient_id');
     }
    
 }
