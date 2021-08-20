@@ -9,6 +9,9 @@ class address extends Model
 {
     
     use HasFactory;
+
+    protected $primaryKey = 'address_id';
+
     protected $fillable = [
         'address_1',
         'address_2',

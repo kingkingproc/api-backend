@@ -9,6 +9,8 @@ class LkupPatientDiagnosisRemoteSite extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'remote_site_id';
+
     protected $fillable = [
         'remote_site_label'
     ];

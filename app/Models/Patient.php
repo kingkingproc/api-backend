@@ -9,6 +9,8 @@ class Patient extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'patient_id';
+
     protected $fillable = [
         'email',
         'type',
@@ -37,16 +39,5 @@ class Patient extends Model
 
         return $this->hasOne('App\Models\PatientDiagnosis', 'patient_id', 'id');
     }
-
-    /*
-    function getPatientContactData() {
-        $contacts = $this->hasMany('App\Models\PatientContact');
-        //$contacts = json_decode($contacts);
-        //foreach($contacts as $contact) {
-        //    $array[] = $contact->hasMany('App\Models\PatientContactData');
-        //}
-        return $contacts->hasMany('App\Models\PatientContactData');;
-    }
-        */
-    
+   
 }

@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class LkupPatientDiagnosisCancerType extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = 'cancer_type_id';
+
     protected $fillable = [
         'cancer_type_label'
     ];

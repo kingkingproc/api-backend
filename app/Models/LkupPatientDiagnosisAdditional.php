@@ -9,6 +9,8 @@ class LkupPatientDiagnosisAdditional extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'additional_id';
+
     protected $fillable = [
         'additional_label'
     ];
