@@ -17,15 +17,6 @@ class PatientFullController extends Controller
 {
     public function show($id)
     {
-        //
-/*
-       $data = Patient::join('patient_contacts', 'patient_contacts.patient_id', '=', 'patients.id')
-            ->join('patient_contact_data', 'patient_contact_data.contact_id', '=', 'patient_contacts.id')
-            ->join('lkup_contact_data_types', 'lkup_contact_data_types.id', '=', 'patient_contact_data.contact_data_type_id')
-            ->join('lkup_contact_types', 'lkup_contact_types.id', '=', 'patient_contacts.contact_type_id')
-            ->where('patients.id', $id)
-            ->get(['patient_contact_data.id', 'patient_contact_data.contact_id', 'patient_contact_data.contact_data_type_id','patient_contact_data.contact_data']);
- */           
 
         $json1 = json_encode(['patient'=>Patient::find($id)]);
         $json2 = json_encode(['patient_address'=>Patient::find($id)->getAddresses]);
@@ -107,7 +98,7 @@ class PatientFullController extends Controller
             $json28 = json_encode(['remote_site'=>patientdiagnosisremotesite::find($remote_site_s->remote_site_id)->remote_sites]);
             $array[] = json_decode($json28, true);
         }
-        return $array;
+        return json_encode($array, JSON_PRETTY_PRINT);
     }
 
     public function update(Request $request, $id)

@@ -27,7 +27,7 @@ class Patient extends Model
 
     function getPatientContacts() {
 
-        return $this->hasMany('App\Models\PatientContact');
+        return $this->hasMany('App\Models\PatientContact', 'patient_id', 'patient_id');
     }
 
     function getAddresses() {
