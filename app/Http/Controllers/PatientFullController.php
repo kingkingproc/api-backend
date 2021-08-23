@@ -46,7 +46,7 @@ class PatientFullController extends Controller
         $patient_array['contacts']=$var_array;
 
         $var_array = [];
-        
+
         $patientdiagnosis = Patient::find($id)->getDiagnosis;
         $diagnosis_id = $patientdiagnosis->diagnosis_id;
 
@@ -59,11 +59,11 @@ class PatientFullController extends Controller
         $array_perfomance_score = patientdiagnosis::find($diagnosis_id)->performance_score;
 
         $array_patient_diagnosis['cancer_type_label'] = $array_cancer_type->cancer_type_label;
-        $array_patient_diagnosis['cell_type_label'] = $array_cell_type->cell_type_label;
+        if (!is_null($array_cell_type)) {$array_patient_diagnosis['cell_type_label'] = $array_cell_type->cell_type_label;}
         $array_patient_diagnosis['stage_label'] = $array_stage->stage_label;
-        $array_patient_diagnosis['tumor_site_label'] = $array_tumor_site->tumor_site_label;
-        $array_patient_diagnosis['tumor_size_label'] = $array_tumor_size->tumor_size_label;
-        $array_patient_diagnosis['performance_score_label'] = $array_perfomance_score->performance_score_label;
+        if (!is_null($array_tumor_site)) {$array_patient_diagnosis['tumor_site_label'] = $array_tumor_site->tumor_site_label;}
+        if (!is_null($array_tumor_size)) {$array_patient_diagnosis['tumor_size_label'] = $array_tumor_size->tumor_size_label;}
+        if (!is_null($array_perfomance_score)) {$array_patient_diagnosis['performance_score_label'] = $array_perfomance_score->performance_score_label;}
 
         $patient_array['diagnosis']=$array_patient_diagnosis;
         
