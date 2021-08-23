@@ -18,87 +18,90 @@ class PatientFullController extends Controller
     public function show($id)
     {
 
-        $json1 = json_encode(['patient'=>Patient::find($id)]);
-        $json2 = json_encode(['patient_address'=>Patient::find($id)->getAddresses]);
-       // $json3 = json_encode(['patient_contact'=>Patient::find($id)->getPatientContacts]);
-       // $json4 = json_encode(['contact_data'=>$data]);
+        $patient_array = Patient::find($id);
+        $patient_address_array = Patient::find($id)->getAddresses;
+        $patient_array['address']=$patient_address_array;
+        //return $patient_array;
 
-
-        $array[] = json_decode($json1, true);
-        $array[] = json_decode($json2, true);
-       // $array[] = json_decode($json3, true);
-       // $array[] = json_decode($json4, true); 
-
+        $var_array = [];
        $patient_contacts = Patient::find($id)->getPatientContacts;
+
        foreach ($patient_contacts as $contact){
-        //$array[] = $treatment_s;
-        $json8 = "";
-        $json9 = "";
-        $json10 = "";
-        $json11 = "";
-        $json8 = json_encode(['paitent_contact'=>$contact]);
-        $array[] = json_decode($json8, true);
-        if (!empty($contact->address_id)) {
-            $json12 = json_encode(['contact_address'=>address::find($contact->address_id)]);
-            $array[] = json_decode($json12, true);
-        }
-        $json9 = json_encode(['paitent_contact_type'=>patientcontact::find($contact->contact_id)->getPatientContactType]);
+        $contact_type = patientcontact::find($contact->contact_id)->getPatientContactType;
+        $contact['contact_type'] = $contact_type->contact_type;
+
         $paitent_contact_data = PatientContact::find($contact->contact_id)->getPatientContactData;
-        $json10 = json_encode(['paitent_contact_data'=>$paitent_contact_data]);
-        $json11 = json_encode(['paitent_contact_data_type'=>LkupContactDataType::find($paitent_contact_data->contact_data_type_id)]);
-        
-        
-        $array[] = json_decode($json9, true);
-        $array[] = json_decode($json10, true);
-        $array[] = json_decode($json11, true);
+        $paitent_contact_data_type = LkupContactDataType::find($paitent_contact_data->contact_data_type_id);
+        $paitent_contact_data['contact_data_type'] = $paitent_contact_data_type->contact_data_type;
+        $contact['contact_data'] = $paitent_contact_data;
+
+            if (!empty($contact->address_id)) {
+                $contact_address = address::find($contact->address_id);
+                $contact['address']=$contact_address;
+            }
+                 
+        $var_array[] = $contact;
         }
 
+        $patient_array['contacts']=$var_array;
+
+        $var_array = [];
+        
         $patientdiagnosis = Patient::find($id)->getDiagnosis;
         $diagnosis_id = $patientdiagnosis->diagnosis_id;
 
-        $json21 = json_encode(['patient_diagnosis'=> $patientdiagnosis]);
-        $json22 = json_encode(['cancer_type'=>patientdiagnosis::find($diagnosis_id)->cancer_type]);
-        $json23 = json_encode(['cell_type'=>patientdiagnosis::find($diagnosis_id)->cell_type]);
-        $json24 = json_encode(['stage'=>patientdiagnosis::find($diagnosis_id)->stage]);
-        $json25 = json_encode(['tumor_site'=>patientdiagnosis::find($diagnosis_id)->tumor_site]);
-        $json26 = json_encode(['tumor_size'=>patientdiagnosis::find($diagnosis_id)->tumor_size]);
-        $json27 = json_encode(['perfomance_score'=>patientdiagnosis::find($diagnosis_id)->performance_score]);
-        
-        $array[] = json_decode($json21, true);
-        $array[] = json_decode($json22, true);
-        $array[] = json_decode($json23, true);
-        $array[] = json_decode($json24, true);
-        $array[] = json_decode($json25, true);
-        $array[] = json_decode($json26, true);
-        $array[] = json_decode($json27, true);
+        $array_patient_diagnosis = $patientdiagnosis;
+        $array_cancer_type = patientdiagnosis::find($diagnosis_id)->cancer_type;
+        $array_cell_type = patientdiagnosis::find($diagnosis_id)->cell_type;
+        $array_stage = patientdiagnosis::find($diagnosis_id)->stage;
+        $array_tumor_site = patientdiagnosis::find($diagnosis_id)->tumor_site;
+        $array_tumor_size = patientdiagnosis::find($diagnosis_id)->tumor_size;
+        $array_perfomance_score = patientdiagnosis::find($diagnosis_id)->performance_score;
+
+        $array_patient_diagnosis['cancer_type_label'] = $array_cancer_type->cancer_type_label;
+        $array_patient_diagnosis['cell_type_label'] = $array_cell_type->cell_type_label;
+        $array_patient_diagnosis['stage_label'] = $array_stage->stage_label;
+        $array_patient_diagnosis['tumor_site_label'] = $array_tumor_site->tumor_site_label;
+        $array_patient_diagnosis['tumor_size_label'] = $array_tumor_size->tumor_size_label;
+        $array_patient_diagnosis['performance_score_label'] = $array_perfomance_score->performance_score_label;
+
+        $patient_array['diagnosis']=$array_patient_diagnosis;
         
         $treatment = patientdiagnosis::find($diagnosis_id)->treatment;
         $additional = patientdiagnosis::find($diagnosis_id)->additional;
         $remote_site = patientdiagnosis::find($diagnosis_id)->remote_site;
 
-
-
         foreach ($treatment as $treatment_s){
-            //$array[] = $treatment_s;
-            $json28 = "";
-            $json28 = json_encode(['treatment'=>patientdiagnosistreatment::find($treatment_s->treatment_id)->treatments]);
-            $array[] = json_decode($json28, true);
+            $treatment_labels = patientdiagnosistreatment::find($treatment_s->treatment_id)->treatments;
+            foreach ($treatment_labels as $treatment_label){
+                $treatment_s['treatment_label']=$treatment_label->treatment_label;
+            }
+            $var_array[]=$treatment_s;
         }
- 
-        foreach ($additional as $additional_s){
-            //$array[] = $treatment_s;
-            $json28 = "";
-            $json28 = json_encode(['additional'=>patientdiagnosisadditional::find($additional_s->additional_id)->additionals]);
-            $array[] = json_decode($json28, true);
-        }
+        
+        $patient_array['treatments']=$var_array;
 
-        foreach ($remote_site as $remote_site_s){
-            //$array[] = $treatment_s;
-            $json28 = "";
-            $json28 = json_encode(['remote_site'=>patientdiagnosisremotesite::find($remote_site_s->remote_site_id)->remote_sites]);
-            $array[] = json_decode($json28, true);
+        $var_array = [];
+        foreach ($additional as $additional_s){
+            $additional_labels = patientdiagnosisadditional::find($additional_s->additional_id)->additionals;
+            foreach ($additional_labels as $additional_label){
+                $additional_s['additional_label']=$additional_label->additional_label;
+            }
+            $var_array[]=$additional_s;
         }
-        return json_encode($array, JSON_PRETTY_PRINT);
+        $patient_array['additionals']=$var_array;
+
+        $var_array = [];
+        foreach ($remote_site as $remote_site_s){
+            $remote_site_labels = patientdiagnosisremotesite::find($remote_site_s->remote_site_id)->remote_sites;
+            foreach ($remote_site_labels as $remote_site_label){
+                $remote_site_s['remote_site_label']=$remote_site_label->remote_site_label;
+            }
+            $var_array[]=$remote_site_s;
+        }
+        $patient_array['remote_sites']=$var_array;
+
+        return json_encode($patient_array, JSON_PRETTY_PRINT);
     }
 
     public function update(Request $request, $id)
