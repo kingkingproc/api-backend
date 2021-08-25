@@ -61,4 +61,15 @@ class LkupPatientDiagnosisAdditionalController extends Controller
     {
         //
     }
+
+    /**
+     * Search for the specified resource in storage.
+     *
+     * @param  str  $label
+     * @return \Illuminate\Http\Response
+     */
+    public function search($label)
+    {
+        return lkuppatientdiagnosisadditional::where('additional_label', 'like', $label.'%')->get();
+    }
 }
