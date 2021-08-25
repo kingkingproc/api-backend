@@ -14,4 +14,6 @@ class LkupPatientDiagnosisCellType extends Model
     protected $fillable = [
         'cell_type_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

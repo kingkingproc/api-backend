@@ -14,4 +14,6 @@ class LkupContactDataType extends Model
     protected $fillable = [
         'contact_data_type'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

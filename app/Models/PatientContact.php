@@ -18,6 +18,8 @@ class PatientContact extends Model
         'contact_type_id'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     function getPatientContactType() {
 
         return $this->hasOne('App\Models\LkupContactType', 'contact_type_id','contact_type_id');

@@ -14,4 +14,6 @@ class LkupPatientDiagnosisCancerStage extends Model
     protected $fillable = [
         'cancer_stage_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

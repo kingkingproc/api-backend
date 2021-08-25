@@ -14,4 +14,6 @@ class LkupPatientDiagnosisTumorSite extends Model
     protected $fillable = [
         'tumor_site_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

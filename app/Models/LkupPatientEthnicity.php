@@ -14,4 +14,6 @@ class LkupPatientEthnicity extends Model
     protected $fillable = [
         'ethnicity_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

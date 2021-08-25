@@ -14,4 +14,6 @@ class LkupPatientDiagnosisRemoteSite extends Model
     protected $fillable = [
         'remote_site_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

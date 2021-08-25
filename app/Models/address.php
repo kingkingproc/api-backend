@@ -21,7 +21,7 @@ class address extends Model
         'address_country'
     ];
 
-
+    protected $hidden = ['created_at', 'updated_at'];
 
     
 }

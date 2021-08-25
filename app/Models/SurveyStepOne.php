@@ -13,5 +13,5 @@ class SurveyStepOne extends Model
 
     protected $primaryKey = 'patient_id';
 
-    protected $fillable = ["name_first", "name_middle", "name_last"];
+    protected $fillable = ["name_first", "name_middle", "name_last", "sub"];
 }

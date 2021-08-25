@@ -14,4 +14,6 @@ class LkupPatientDiagnosisPerformanceScore extends Model
     protected $fillable = [
         'performance_score_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

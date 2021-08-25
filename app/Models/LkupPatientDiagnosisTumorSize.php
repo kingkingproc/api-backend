@@ -14,4 +14,6 @@ class LkupPatientDiagnosisTumorSize extends Model
     protected $fillable = [
         'tumor_size_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

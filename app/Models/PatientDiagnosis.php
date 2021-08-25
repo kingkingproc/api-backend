@@ -22,6 +22,8 @@ class PatientDiagnosis extends Model
         'dod'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function cancer_type() {
 
         return $this->hasOne('App\Models\LkupPatientDiagnosisCancerType', 'cancer_type_id', 'cancer_type_id');

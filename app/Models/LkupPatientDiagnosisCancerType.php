@@ -14,4 +14,6 @@ class LkupPatientDiagnosisCancerType extends Model
     protected $fillable = [
         'cancer_type_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

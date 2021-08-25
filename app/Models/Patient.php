@@ -26,6 +26,8 @@ class Patient extends Model
         'is_complete'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     function getPatientContacts() {
 
         return $this->hasMany('App\Models\PatientContact', 'patient_id', 'patient_id');

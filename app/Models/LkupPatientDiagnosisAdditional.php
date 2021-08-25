@@ -14,4 +14,7 @@ class LkupPatientDiagnosisAdditional extends Model
     protected $fillable = [
         'additional_label'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
+    
 }
