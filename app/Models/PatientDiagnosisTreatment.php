@@ -14,6 +14,8 @@ class PatientDiagnosisTreatment extends Model
         'treatment_id'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+    
     public function treatments() {
 
         return $this->hasMany('App\Models\LkupPatientDiagnosisTreatment', 'treatment_id', 'treatment_id');
