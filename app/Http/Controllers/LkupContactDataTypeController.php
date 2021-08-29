@@ -15,7 +15,7 @@ class LkupContactDataTypeController extends Controller
     public function index()
     {
         //
-        return lkupcontactdatatype::all();
+        return lkupcontactdatatype::select('contact_data_type_id AS key','contact_data_type AS value')->get();
     }
 
     /**

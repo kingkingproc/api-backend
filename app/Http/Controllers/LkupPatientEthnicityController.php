@@ -14,7 +14,10 @@ class LkupPatientEthnicityController extends Controller
      */
     public function index()
     {
-        return lkuppatientethnicity::all();
+        //return lkuppatientethnicity::all();
+
+        return lkuppatientethnicity::select('ethnicity_id AS key','ethnicity_label AS value')->get();
+
     }
 
     /**

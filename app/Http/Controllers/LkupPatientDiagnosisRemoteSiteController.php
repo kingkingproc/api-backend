@@ -14,7 +14,7 @@ class LkupPatientDiagnosisRemoteSiteController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosisremotesite::all();
+        return lkuppatientdiagnosisremotesite::select('remote_site_id AS key','remote_site_label AS value')->get();
     }
 
     /**

@@ -14,7 +14,7 @@ class LkupPaitentDiagnosisPerformanceScoreController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosisperformancescore::all();
+        return lkuppatientdiagnosisperformancescore::select('performance_score_id AS key','performance_score_label AS value')->get();;
     }
 
     /**

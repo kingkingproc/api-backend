@@ -14,7 +14,7 @@ class LkupPaitentDiagnosisCancerStageController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosiscancerstage::all();
+        return lkuppatientdiagnosiscancerstage::select('cancer_stage_id AS key','stage_label AS value')->get();;
     }
 
     /**

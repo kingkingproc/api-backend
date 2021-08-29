@@ -14,7 +14,7 @@ class LkupPaitentDiagnosisCellTypeController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosiscelltype::all();
+        return lkuppatientdiagnosiscelltype::select('cell_type_id AS key','cell_type_label AS value')->get();;
     }
 
     /**

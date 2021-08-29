@@ -14,7 +14,7 @@ class LkupPaitentDiagnosisCancerTypeController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosiscancertype::all();
+        return lkuppatientdiagnosiscancertype::select('cancer_type_id AS key','cancer_type_label AS value')->get();;
     }
 
     /**

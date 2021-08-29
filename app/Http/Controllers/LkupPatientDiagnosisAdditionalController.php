@@ -14,7 +14,7 @@ class LkupPatientDiagnosisAdditionalController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosisadditional::all();
+        return lkuppatientdiagnosisadditional::select('additional_id AS key','additional_label AS value')->get();
     }
 
     /**

@@ -14,7 +14,7 @@ class LkupPaitentDiagnosisTumorSizeController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosistumorsize::all();
+        return lkuppatientdiagnosistumorsize::select('tumor_size_id AS key','tumor_size_label AS value')->get();
     }
 
     /**

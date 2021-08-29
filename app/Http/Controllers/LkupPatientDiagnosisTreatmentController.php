@@ -14,7 +14,7 @@ class LkupPatientDiagnosisTreatmentController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosistreatment::all();
+        return lkuppatientdiagnosistreatment::select('treatment_id AS key','treatment_label AS value')->get();
     }
 
     /**
