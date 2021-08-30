@@ -14,12 +14,14 @@ class Patient extends Model
 
     protected $fillable = [
         'email',
-        'type',
+        'user_type',
         'sub',
         'name_first',
         'name_middle',
         'name_last',
-        'dob',
+        'dob_day',
+        'dob_month',
+        'dob_year',
         'sex',
         'ethnicity_id',
         'address_id',
