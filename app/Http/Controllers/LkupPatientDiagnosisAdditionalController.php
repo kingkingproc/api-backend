@@ -70,6 +70,8 @@ class LkupPatientDiagnosisAdditionalController extends Controller
      */
     public function search($label)
     {
-        return lkuppatientdiagnosisadditional::where('additional_label', 'like', $label.'%')->get();
+        return lkuppatientdiagnosisadditional::select('additional_id AS key','additional_label AS value')
+                                                ->where('additional_label', 'ilike', $label.'%')
+                                                ->get();
     }
 }

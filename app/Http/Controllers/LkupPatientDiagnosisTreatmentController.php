@@ -70,6 +70,8 @@ class LkupPatientDiagnosisTreatmentController extends Controller
      */
     public function search($label)
     {
-        return lkuppatientdiagnosistreatment::where('treatment_label', 'like', $label.'%')->get();
+        return lkuppatientdiagnosistreatment::select('treatment_id AS key','treatment_label AS value')
+                                                ->where('treatment_label', 'ilike', $label.'%')
+                                                ->get();
     }
 }

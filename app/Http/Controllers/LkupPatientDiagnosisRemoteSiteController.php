@@ -70,6 +70,8 @@ class LkupPatientDiagnosisRemoteSiteController extends Controller
      */
     public function search($label)
     {
-        return lkuppatientdiagnosisremotesite::where('remote_site_label', 'like', $label.'%')->get();
+        return lkuppatientdiagnosisremotesite::select('remote_site_id AS key','remote_site_label AS value')
+                                                ->where('remote_site_label', 'ilike', $label.'%')
+                                                ->get();
     }
 }
