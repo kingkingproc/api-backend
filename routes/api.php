@@ -36,7 +36,9 @@ Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeControlle
 Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController');
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
 Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeController');
-Route::resource('surveycomplete','App\Http\Controllers\SurveyCompleteController');
+//Route::resource('surveycomplete','App\Http\Controllers\SurveyCompleteController');
+
+Route::put('/surveycomplete','App\Http\Controllers\SurveyCompleteController@update');
 
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
