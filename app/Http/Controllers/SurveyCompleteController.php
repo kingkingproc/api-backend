@@ -64,20 +64,36 @@ class SurveyCompleteController extends Controller
             $request = request();
             $token = $request->bearerToken();
             $tokenParts = explode(".", $token);  
+            $tokenHeader = base64_decode($tokenParts[0]);
             $tokenPayload = base64_decode($tokenParts[1]);
-            $tokenPayloadParts = explode(",", $tokenPayload);
-            $subline = $tokenPayloadParts[1];
-            $sublineParts = explode(":", $subline);
-            $patientSub = json_decode($sublineParts[1]);
+            $jwtHeader = json_decode($tokenHeader);
+            $jwtPayload = json_decode($tokenPayload);
+
+
+/*
+            if ( 
+            ($jwtPayload->sub==$jwtPayload->username)
+            && ($jwtPayload->iss=="https://cognito-idp.".$_ENV["AWS_COGNITO_REGION"].".amazonaws.com/".$_ENV["AWS_COGNITO_USER_POOL_ID"])
+            && ($jwtPayload->client_id==$_ENV["AWS_COGNITO_CLIENT_ID"])
+            && ($jwtPayload->token_use==$_ENV["AWS_COGNITO_TOKEN"])
+            && ($jwtPayload->scope==$_ENV["AWS_COGNITO_SCOPE"])
+            && in_array($jwtHeader->kid,json_decode($_ENV["AWS_COGNITO_KEYS"]))
+            ) {
+                //return ["message"=>"Good Token"];
+            } else {
+                return ["message"=>"Bad Token"];
+            }
+*/
             // END Code to get the sub from a JWT
 
             // Get the patient record for the sub
-            $patientRecord = patient::where('sub',$patientSub)->get();
+            $patientRecord = patient::where('sub',$jwtPayload->sub)->get();
 
             // put patient request data into array
             $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
             $patient_array['ethnicity_id']=$request['ethnicity'];
-            $patient_array['is_complete']=1;
+            $patient_array['is_complete']=$request['is_complete'];
+            $patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
 
             //put address request data into array
             $address_array['address_city']=$request['city'];

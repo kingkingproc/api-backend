@@ -13,7 +13,7 @@ use App\Http\Controllers\AuthController;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     
 });
-
+*/
 
 Route::resource('address','App\Http\Controllers\AddressController');
 Route::resource('patient','App\Http\Controllers\PatientController');
@@ -65,7 +65,8 @@ Route::get('/lkuppatientdiagnosistreatment/search/{label}',['App\Http\Controller
 Route::get('/lkuppatientdiagnosisremotesite/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisRemoteSiteController', 'search']);
 
 
-
+/*
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+*/
