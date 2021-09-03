@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
+
 use App\Models\Patient;
 use App\Models\address;
 use App\Models\PatientContact;
@@ -17,6 +20,19 @@ class PatientFullController extends Controller
 {
     public function index()
     {
+
+        $the_publicKey = <<<EOD
+        -----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvleu+AiTPf88464y4vB3
+        0rhpjQbwRFfALzIe7DzyRUUCDm6FKzDrrCd78QbtkOIvAOM9De9Oso61IVtrvtAx
+        /QiR9ymAYv4cBrPkuc2S15PCGEaXP03xwMlu6W3VMR0rcnzCMPUkeW9WAnI79w8i
+        S5nSpV4QXTau7DCF2gHDveWyWZRH3nayjSXOWip+kZYlyDJ7vATJgfEylTNZ2daG
+        g0rG24+ce0a6Jx2X0cWTI6arkn9VQS77MebgdfhMX6uv4kL3I8A0BvhEnkp5W77y
+        pjYhxfhjZP68QHKXKksuIKJhM//5SIzhbQt2nbPtPRG0aGyL2riKbI8DGYha0zmZ
+        CwIDAQAB
+        -----END PUBLIC KEY-----
+        EOD;
+
         $request = request();
         $token = $request->bearerToken();
         $tokenParts = explode(".", $token);  
@@ -24,6 +40,17 @@ class PatientFullController extends Controller
         $tokenPayload = base64_decode($tokenParts[1]);
         $jwtHeader = json_decode($tokenHeader);
         $jwtPayload = json_decode($tokenPayload);
+
+        $the_object = JWT::decode($token,$the_publicKey,['RS256', 'RS256']);
+
+        if ( ($the_object->iss=="https://cognito-idp.".$_ENV["AWS_COGNITO_REGION"].".amazonaws.com/".$_ENV["AWS_COGNITO_USER_POOL_ID"])
+            && ($the_object->aud==$_ENV["AWS_COGNITO_CLIENT_ID"])
+            && ($the_object->token_use==$_ENV["AWS_COGNITO_TOKEN"])
+            ) {
+                // DO NOTHING return ["message"=>"Good Token"];
+            } else {
+                return ["message"=>"Bad Token"];
+            }
 
         //return $jwtPayload->sub;
         $patientRecord = patient::where('sub',$jwtPayload->sub)->get();
