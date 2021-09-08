@@ -40,6 +40,8 @@ Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeControll
 
 Route::put('/surveycomplete','App\Http\Controllers\SurveyCompleteController@update');
 
+Route::put('/patientprofile','App\Http\Controllers\PatientProfileController@update');
+
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
 Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');

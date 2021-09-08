@@ -18,6 +18,27 @@ use App\Models\PatientDiagnosisRemoteSite;
 
 class SurveyCompleteController extends Controller
 {
+    public function verifyJasonToken(Request $request) {
+        $the_publicKey = config('services.aws.COGNITO_PUBLIC_KEY');
+        $token = $request->bearerToken();
+        $tokenParts = explode(".", $token);  
+        $tokenHeader = base64_decode($tokenParts[0]);
+        $tokenPayload = base64_decode($tokenParts[1]);
+        $jwtHeader = json_decode($tokenHeader);
+        $jwtPayload = json_decode($tokenPayload);
+
+        $the_object = JWT::decode($token,$the_publicKey,['RS256', 'RS256']);
+
+       
+        if ( ($the_object->iss=="https://cognito-idp.".config('services.aws.COGNITO_REGION').".amazonaws.com/".config('services.aws.COGNITO_USER_POOL_ID'))
+            && ($the_object->aud==config('services.aws.COGNITO_CLIENT_ID'))
+            && ($the_object->token_use==config('services.aws.COGNITO_TOKEN'))
+            ) {
+                return $the_object;
+            } else {
+                return ["message"=>"Bad Token"];
+            }
+    }
     /**
      * Display a listing of the resource.
      *
@@ -62,46 +83,14 @@ class SurveyCompleteController extends Controller
      */
     public function update(Request $request)
     {
-        $the_publicKey = <<<EOD
-        -----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvleu+AiTPf88464y4vB3
-        0rhpjQbwRFfALzIe7DzyRUUCDm6FKzDrrCd78QbtkOIvAOM9De9Oso61IVtrvtAx
-        /QiR9ymAYv4cBrPkuc2S15PCGEaXP03xwMlu6W3VMR0rcnzCMPUkeW9WAnI79w8i
-        S5nSpV4QXTau7DCF2gHDveWyWZRH3nayjSXOWip+kZYlyDJ7vATJgfEylTNZ2daG
-        g0rG24+ce0a6Jx2X0cWTI6arkn9VQS77MebgdfhMX6uv4kL3I8A0BvhEnkp5W77y
-        pjYhxfhjZP68QHKXKksuIKJhM//5SIzhbQt2nbPtPRG0aGyL2riKbI8DGYha0zmZ
-        CwIDAQAB
-        -----END PUBLIC KEY-----
-        EOD;
-
         $request = request();
-        $token = $request->bearerToken();
-        $tokenParts = explode(".", $token);  
-        $tokenHeader = base64_decode($tokenParts[0]);
-        $tokenPayload = base64_decode($tokenParts[1]);
-        $jwtHeader = json_decode($tokenHeader);
-        $jwtPayload = json_decode($tokenPayload);
-
-        $the_object = JWT::decode($token,$the_publicKey,['RS256', 'RS256']);
-
-        if ( ($the_object->iss=="https://cognito-idp.".$_ENV["AWS_COGNITO_REGION"].".amazonaws.com/".$_ENV["AWS_COGNITO_USER_POOL_ID"])
-            && ($the_object->aud==$_ENV["AWS_COGNITO_CLIENT_ID"])
-            && ($the_object->token_use==$_ENV["AWS_COGNITO_TOKEN"])
-            ) {
-                // DO NOTHING return ["message"=>"Good Token"];
-            } else {
-                return ["message"=>"Bad Token"];
-            }
-
-        //return $jwtPayload->sub;
-
+        $the_object = self::verifyJasonToken($request);
             // Get the patient record for the sub
-            $patientRecord = patient::where('sub',$jwtPayload->sub)->get();
+            $patientRecord = patient::where('sub',$the_object->sub)->get();
 
             // put patient request data into array
             $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
             $patient_array['ethnicity_id']=$request['ethnicity'];
-            $patient_array['is_complete']=$request['is_complete'];
             $patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
 
             //put address request data into array
@@ -139,6 +128,7 @@ class SurveyCompleteController extends Controller
             }
             
             //put diagnosis request data into array
+            $diagnosis_array['patient_id']=$patient['patient_id'];
             $diagnosis_array['cancer_type_id']=$request['diagnosis'];
             $diagnosis_array['stage_id']=$request['stage']; 
 
