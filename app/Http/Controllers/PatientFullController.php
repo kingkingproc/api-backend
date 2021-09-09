@@ -18,6 +18,8 @@ use App\Models\PatientDiagnosisAdditional;
 use App\Models\PatientDiagnosisRemoteSite;
 use App\Models\SurveyStepOne;
 use App\Models\LkupPatientDiagnosisRemoteSite;
+use App\Models\LkupPatientDiagnosisTreatment;
+use App\Models\LkupPatientDiagnosisAdditional;
 
 use Illuminate\Http\Request;
 
@@ -123,7 +125,8 @@ class PatientFullController extends Controller
         
 
         foreach ($treatment as $treatment_s){
-            $treatment_labels = patientdiagnosistreatment::find($treatment_s->treatment_id)->treatments;
+            $treatment_labels = lkuppatientdiagnosistreatment::find($treatment_s->treatment_id);
+            $treatment_labels = array($treatment_labels);
             foreach ($treatment_labels as $treatment_label){
                 $treatment_s['treatment_label']=$treatment_label->treatment_label;
             }
@@ -134,7 +137,8 @@ class PatientFullController extends Controller
 
         $var_array = [];
         foreach ($additional as $additional_s){
-            $additional_labels = patientdiagnosisadditional::find($additional_s->additional_id)->additionals;
+            $additional_labels = lkuppatientdiagnosisadditional::find($additional_s->additional_id);
+            $additional_labels = array($additional_labels);
             foreach ($additional_labels as $additional_label){
                 $additional_s['additional_label']=$additional_label->additional_label;
             }
@@ -145,7 +149,6 @@ class PatientFullController extends Controller
         $var_array = [];
         
         foreach ($remote_site as $remote_site_s){
-            //$remote_site_labels = patientdiagnosisremotesite::find($remote_site_s->remote_site_id)->remote_sites;
             $remote_site_labels = lkuppatientdiagnosisremotesite::find($remote_site_s->remote_site_id);
             $remote_site_labels = array($remote_site_labels);
             foreach ($remote_site_labels as $remote_site_label){
