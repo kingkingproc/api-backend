@@ -43,6 +43,8 @@ Route::put('/surveycomplete','App\Http\Controllers\SurveyCompleteController@upda
 Route::put('/patientprofile','App\Http\Controllers\PatientProfileController@update');
 Route::put('/patientprofilediagnosis','App\Http\Controllers\PatientProfileDiagnosisController@update');
 
+Route::get('/trialresult','App\Http\Controllers\TestController@index');
+
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
 Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');

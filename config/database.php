@@ -78,6 +78,21 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'pgsql2' => [
+            'driver' => 'pgsql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST2', 'magpie-1104.clqi7oqv5sfm.us-east-2.rds.amazonaws.com'),
+            'port' => env('DB_PORT2', '5432'),
+            'database' => env('DB_DATABASE2', 'postgres'),
+            'username' => env('DB_USERNAME2'),
+            'password' => env('DB_PASSWORD2'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
