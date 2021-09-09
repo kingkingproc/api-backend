@@ -47,7 +47,7 @@ class PatientProfileController extends Controller
             // put patient request data into array
             $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
             $patient_array['ethnicity_id']=$request['ethnicity'];
-            $patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
+            //$patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
 
             //put address request data into array
             $address_array['address_1']=$request['address_1'];
@@ -91,16 +91,16 @@ class PatientProfileController extends Controller
             $contact_data_array['contact_data_type_id'] = $request['primary_contact_data_type'];
             $contact_data_array['contact_data'] = $request['primary_contact_data'];
 
-            $primaryContactData = patientcontactdata::where('contact_id', '=', $primaryContact_id);
-            
+            $primaryContactData = patientcontactdata::where('contact_id', '=', $primaryContact_id)->get();
 
-            if ($primaryContactData)
+            if ($primaryContactData->isEmpty())
                 {
                     $primaryContactData = patientcontactdata::create($contact_data_array);
                 }
             else
                 {
-                    $primaryContactData = $primaryContactData::update($contact_data_array);
+                    $tempdata = patientcontactdata::find($primaryContactData[0]['patient_contact_data_id']);
+                    $tempdata->update($contact_data_array);
                 }
 
             //secondary contact
@@ -123,15 +123,16 @@ class PatientProfileController extends Controller
             $contact_data_array['contact_data_type_id'] = $request['secondary_contact_data_type'];
             $contact_data_array['contact_data'] = $request['secondary_contact_data'];
 
-            $secondaryContactData = patientcontactdata::where('contact_id', '=', $secondaryContact_id);
+            $secondaryContactData = patientcontactdata::where('contact_id', '=', $secondaryContact_id)->get();
             
-            if ($secondaryContactData)
+            if ($secondaryContactData->isEmpty())
                 {
                     $secondaryContactData = patientcontactdata::create($contact_data_array);
                 }
             else
                 {
-                    $secondaryContactData = $secondaryContactData::update($contact_data_array);
+                    $tempdata = patientcontactdata::find($secondaryContactData[0]['patient_contact_data_id']);
+                    $tempdata->update($contact_data_array);
                 }
         return $request;
     }

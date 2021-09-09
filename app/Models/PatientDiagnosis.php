@@ -19,7 +19,9 @@ class PatientDiagnosis extends Model
         'tumor_site_id',
         'performance_score_id',
         'pathology',
-        'dod'
+        'dod_month',
+        'dod_day',
+        'dod_year'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

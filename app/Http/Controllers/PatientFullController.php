@@ -17,6 +17,7 @@ use App\Models\PatientDiagnosisTreatment;
 use App\Models\PatientDiagnosisAdditional;
 use App\Models\PatientDiagnosisRemoteSite;
 use App\Models\SurveyStepOne;
+use App\Models\LkupPatientDiagnosisRemoteSite;
 
 use Illuminate\Http\Request;
 
@@ -142,8 +143,11 @@ class PatientFullController extends Controller
         $patient_array['additionals']=$var_array;
 
         $var_array = [];
+        
         foreach ($remote_site as $remote_site_s){
-            $remote_site_labels = patientdiagnosisremotesite::find($remote_site_s->remote_site_id)->remote_sites;
+            //$remote_site_labels = patientdiagnosisremotesite::find($remote_site_s->remote_site_id)->remote_sites;
+            $remote_site_labels = lkuppatientdiagnosisremotesite::find($remote_site_s->remote_site_id);
+            $remote_site_labels = array($remote_site_labels);
             foreach ($remote_site_labels as $remote_site_label){
                 $remote_site_s['remote_site_label']=$remote_site_label->remote_site_label;
             }
