@@ -60,6 +60,7 @@ class PatientFullController extends Controller
             //return json_encode(['patient'=>surveystepone::create(array("['sub'=>$jwtPayload->sub]"))]);
             $tempPatient = Patient::create($array);
             $patientRecord = Patient::find($tempPatient->patient_id);
+            $patientRecord = array($patientRecord);
         }
         //return $patientRecord;
 
@@ -74,20 +75,22 @@ class PatientFullController extends Controller
         $patient_contacts = Patient::find($id)->getPatientContacts;
 
        foreach ($patient_contacts as $contact){
-        $contact_type = patientcontact::find($contact->contact_id)->getPatientContactType;
-        $contact['contact_type'] = $contact_type->contact_type;
+           try{
+                $contact_type = patientcontact::find($contact->contact_id)->getPatientContactType;
+                $contact['contact_type'] = $contact_type->contact_type;
+                $paitent_contact_data = PatientContact::find($contact->contact_id)->getPatientContactData;
+                $paitent_contact_data_type = LkupContactDataType::find($paitent_contact_data->contact_data_type_id);
+                $paitent_contact_data['contact_data_type'] = $paitent_contact_data_type->contact_data_type;
+                $contact['contact_data'] = $paitent_contact_data;
 
-        $paitent_contact_data = PatientContact::find($contact->contact_id)->getPatientContactData;
-        $paitent_contact_data_type = LkupContactDataType::find($paitent_contact_data->contact_data_type_id);
-        $paitent_contact_data['contact_data_type'] = $paitent_contact_data_type->contact_data_type;
-        $contact['contact_data'] = $paitent_contact_data;
-
-            if (!empty($contact->address_id)) {
-                $contact_address = address::find($contact->address_id);
-                $contact['address']=$contact_address;
+                    if (!empty($contact->address_id)) {
+                        $contact_address = address::find($contact->address_id);
+                        $contact['address']=$contact_address;
+                    }
+                $var_array[] = $contact;
+            } catch(\Exception $e) {
+                //return 'Error Message';
             }
-                 
-        $var_array[] = $contact;
         }
 
         $patient_array['contacts']=$var_array;

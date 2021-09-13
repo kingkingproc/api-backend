@@ -36,12 +36,14 @@ Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeControlle
 Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController');
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
 Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeController');
-//Route::resource('surveycomplete','App\Http\Controllers\SurveyCompleteController');
+
 
 Route::put('/surveycomplete','App\Http\Controllers\SurveyCompleteController@update');
 
 Route::put('/patientprofile','App\Http\Controllers\PatientProfileController@update');
 Route::put('/patientprofilediagnosis','App\Http\Controllers\PatientProfileDiagnosisController@update');
+Route::put('/patientprofiledoctors','App\Http\Controllers\PatientProfileDoctersController@update');
+
 
 Route::get('/trialresult','App\Http\Controllers\TestController@index');
 
