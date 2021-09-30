@@ -5,11 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Trial extends Model
+class SelectisTrial extends Model
 {
     use HasFactory;
 
-    protected $connection = "pgsql";
+    protected $connection = "pgsql2";
 
-    protected $table = "trial_melanoma";
+    protected $table = "trial";
+
+    protected $primaryKey = 'trial_id';
+
+
 }

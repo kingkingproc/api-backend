@@ -21,7 +21,10 @@ class PatientDiagnosis extends Model
         'pathology',
         'dod_month',
         'dod_day',
-        'dod_year'
+        'dod_year',
+        'is_brain_tumor',
+        'is_metastatic',
+        'cancer_sub_type_id'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
@@ -29,6 +32,11 @@ class PatientDiagnosis extends Model
     public function cancer_type() {
 
         return $this->hasOne('App\Models\LkupPatientDiagnosisCancerType', 'cancer_type_id', 'cancer_type_id');
+    }
+
+    public function cancer_sub_type() {
+
+        return $this->hasOne('App\Models\LkupPatientDiagnosisCancerSubType', 'cancer_sub_type_id', 'cancer_sub_type_id');
     }
 
     public function cell_type() {
@@ -66,5 +74,9 @@ class PatientDiagnosis extends Model
 
     public function additional() {
         return $this->hasMany('App\Models\PatientDiagnosisAdditional', 'diagnosis_id','diagnosis_id');
+    }
+
+    public function biomarker() {
+        return $this->hasMany('App\Models\PatientDiagnosisBiomarker', 'diagnosis_id','diagnosis_id');
     }
 }

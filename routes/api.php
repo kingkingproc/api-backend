@@ -46,10 +46,14 @@ Route::put('/patientprofiledoctors','App\Http\Controllers\PatientProfileDoctersC
 
 
 Route::get('/trialresult','App\Http\Controllers\TestController@index');
+Route::get('/specialistresult','App\Http\Controllers\SpecialistController@index');
+
+Route::get('/trialbuild','App\Http\Controllers\TestTrialLoadController@index');
 
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
 Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');
+
 
 
 
@@ -65,11 +69,15 @@ Route::resource('lkuppatientdiagnosiscelltype','App\Http\Controllers\LkupPaitent
 Route::resource('lkuppatientdiagnosisscore','App\Http\Controllers\LkupPaitentDiagnosisPerformanceScoreController');
 Route::resource('lkuppatientdiagnosistumorsite','App\Http\Controllers\LkupPaitentDiagnosisTumorSiteController');
 Route::resource('lkuppatientdiagnosistumorsize','App\Http\Controllers\LkupPaitentDiagnosisTumorSizeController');
+Route::resource('lkuppatientdiagnosisbiomarker','App\Http\Controllers\LkupPatientDiagnosisBiomarkerController');
+Route::resource('lkuppatientdiagnosissubtype','App\Http\Controllers\LkupPatientDiagnosisSubTypeController');
+
 
 // search routes for auto complete fields
 Route::get('/lkuppatientdiagnosisadditional/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisAdditionalController', 'search']);
 Route::get('/lkuppatientdiagnosistreatment/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisTreatmentController', 'search']);
 Route::get('/lkuppatientdiagnosisremotesite/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisRemoteSiteController', 'search']);
+Route::get('/lkuppatientdiagnosissubtype/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisSubTypeController', 'search']);
 
 
 /*

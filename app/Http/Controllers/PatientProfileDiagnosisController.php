@@ -14,6 +14,7 @@ use App\Models\PatientDiagnosis;
 use App\Models\PatientDiagnosisAdditional;
 use App\Models\PatientDiagnosisRemoteSite;
 use App\Models\PatientDiagnosisTreatment;
+use App\Models\PatientDiagnosisBiomarker;
 
 class PatientProfileDiagnosisController extends Controller
 {
@@ -48,16 +49,19 @@ class PatientProfileDiagnosisController extends Controller
             $patientRecord = patient::where('sub',$the_object->sub)->get();
 
             //put diagnosis request data into array
+            //$diagnosis_array['tumor_site_id']=$request['tumor_site'];
+            //$diagnosis_array['tumor_size_id']=$request['tumor_size'];
+            //$diagnosis_array['pathology']=$request['pathology'];
+            //$diagnosis_array['cell_type_id']=$request['cell_type'];
             $diagnosis_array['dod_month']=$request['dod_month'];
             $diagnosis_array['dod_day']=$request['dod_day'];
             $diagnosis_array['dod_year']=$request['dod_year'];
-            $diagnosis_array['pathology']=$request['pathology'];
             $diagnosis_array['performance_score_id']=$request['performance_score'];
-            $diagnosis_array['tumor_site_id']=$request['tumor_site'];
-            $diagnosis_array['tumor_size_id']=$request['tumor_size'];
             $diagnosis_array['stage_id']=$request['cancer_stage'];
-            $diagnosis_array['cell_type_id']=$request['cell_type'];
             $diagnosis_array['cancer_type_id']=$request['cancer_type']['key'];
+            $diagnosis_array['cancer_sub_type_id']=$request['cancer_sub_type']['key'];
+            $diagnosis_array['is_brain_tumor']=$request['is_brain_tumor'];
+            $diagnosis_array['is_metastatic']=$request['is_metastatic'];
             $diagnosis_array['patient_id']=$patientRecord[0]['patient_id'];
 
             $diagnosisRecord = patientdiagnosis::where('patient_id',$patientRecord[0]['patient_id'])->get();
@@ -73,16 +77,17 @@ class PatientProfileDiagnosisController extends Controller
             }
 
             DB::table('patient_diagnosis_additionals')->where('diagnosis_id',$diagnosisRecord_id)->delete();
-            DB::table('patient_diagnosis_remote_sites')->where('diagnosis_id',$diagnosisRecord_id)->delete();
+            //DB::table('patient_diagnosis_remote_sites')->where('diagnosis_id',$diagnosisRecord_id)->delete();
             DB::table('patient_diagnosis_treatments')->where('diagnosis_id',$diagnosisRecord_id)->delete();
+            DB::table('patient_diagnosis_biomarkers')->where('diagnosis_id',$diagnosisRecord_id)->delete();
 
-            $remote_sites = $request['remote_sites'];
-            foreach ($remote_sites as $remote_site) {
-                $tempArray = array();
-                $tempArray['diagnosis_id'] = $diagnosisRecord_id;
-                $tempArray['remote_site_id'] = $remote_site['key'];
-                $tempCollection = patientdiagnosisremotesite::create($tempArray);
-            }
+            //$remote_sites = $request['remote_sites'];
+            //foreach ($remote_sites as $remote_site) {
+            //    $tempArray = array();
+            //    $tempArray['diagnosis_id'] = $diagnosisRecord_id;
+            //    $tempArray['remote_site_id'] = $remote_site['key'];
+            //    $tempCollection = patientdiagnosisremotesite::create($tempArray);
+            //}
 
             $prior_treatments = $request['prior_treatments'];
             foreach ($prior_treatments as $prior_treatment) {
@@ -98,6 +103,14 @@ class PatientProfileDiagnosisController extends Controller
                 $tempArray['diagnosis_id'] = $diagnosisRecord_id;
                 $tempArray['additional_id'] = $additional['key'];
                 $tempCollection = patientdiagnosisadditional::create($tempArray);
+            }
+
+            $biomarkers = $request['biomarkers'];
+            foreach ($biomarkers as $biomarker) {
+                $tempArray = array();
+                $tempArray['diagnosis_id'] = $diagnosisRecord_id;
+                $tempArray['biomarker_id'] = $biomarker['key'];
+                $tempCollection = patientdiagnosisbiomarker::create($tempArray);
             }
 
             return $request;

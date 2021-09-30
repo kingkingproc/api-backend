@@ -91,12 +91,13 @@ class PatientProfileDoctersController extends Controller
             if ($doctor['primary_contact_data_type'] || $doctor['primary_contact_data']) {
                 unset($contact_array);
                 unset($contact_data_array);
-                $contact_array['patient_id'] = $patientId;
-                $contact_array['contact_type_id'] = 4;
-                $primaryContact = patientcontact::create($contact_array);
-                $primaryContact_id = $primaryContact->contact_id;
+                //$contact_array['patient_id'] = $patientId;
+                //$contact_array['contact_type_id'] = 4;
+                //$primaryContact = patientcontact::create($contact_array);
+                //$primaryContact_id = $primaryContact->contact_id;
 
-                $contact_data_array['contact_id'] = $primaryContact_id;
+                //$contact_data_array['contact_id'] = $primaryContact_id;
+                $contact_data_array['contact_id'] = $doctorContact_id;
                 $contact_data_array['contact_data_type_id'] = $doctor['primary_contact_data_type'];
                 $contact_data_array['contact_data'] = $doctor['primary_contact_data'];
 
@@ -107,12 +108,13 @@ class PatientProfileDoctersController extends Controller
             if ($doctor['secondary_contact_data_type'] || $doctor['secondary_contact_data']) {
                 unset($contact_array);
                 unset($contact_data_array);
-                $contact_array['patient_id'] = $patientId;
-                $contact_array['contact_type_id'] = 5;
-                $secondaryContact = patientcontact::create($contact_array);
-                $secondaryContact_id = $secondaryContact->contact_id;
+                //$contact_array['patient_id'] = $patientId;
+                //$contact_array['contact_type_id'] = 5;
+                //$secondaryContact = patientcontact::create($contact_array);
+                //$secondaryContact_id = $secondaryContact->contact_id;
 
-                $contact_data_array['contact_id'] = $secondaryContact_id;
+                //$contact_data_array['contact_id'] = $secondaryContact_id;
+                $contact_data_array['contact_id'] = $doctorContact_id;
                 $contact_data_array['contact_data_type_id'] = $doctor['secondary_contact_data_type'];
                 $contact_data_array['contact_data'] = $doctor['secondary_contact_data'];
 
@@ -123,12 +125,13 @@ class PatientProfileDoctersController extends Controller
             if ($doctor['other_contact_data_type'] || $doctor['other_contact_data']) {
                 unset($contact_array);
                 unset($contact_data_array);
-                $contact_array['patient_id'] = $patientId;
-                $contact_array['contact_type_id'] = 6;
-                $additionalContact = patientcontact::create($contact_array);
-                $additionalContact_id = $additionalContact->contact_id;
+                //$contact_array['patient_id'] = $patientId;
+                //$contact_array['contact_type_id'] = 6;
+                //$additionalContact = patientcontact::create($contact_array);
+                //$additionalContact_id = $additionalContact->contact_id;
 
-                $contact_data_array['contact_id'] = $additionalContact_id;
+                //$contact_data_array['contact_id'] = $additionalContact_id;
+                $contact_data_array['contact_id'] = $doctorContact_id;
                 $contact_data_array['contact_data_type_id'] = $doctor['other_contact_data_type'];
                 $contact_data_array['contact_data'] = $doctor['other_contact_data'];
 

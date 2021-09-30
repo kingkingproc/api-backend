@@ -20,6 +20,7 @@ use App\Models\SurveyStepOne;
 use App\Models\LkupPatientDiagnosisRemoteSite;
 use App\Models\LkupPatientDiagnosisTreatment;
 use App\Models\LkupPatientDiagnosisAdditional;
+use App\Models\LkupPatientDiagnosisBiomarker;
 
 use Illuminate\Http\Request;
 
@@ -75,22 +76,29 @@ class PatientFullController extends Controller
         $patient_contacts = Patient::find($id)->getPatientContacts;
 
        foreach ($patient_contacts as $contact){
-           try{
+           //try{
                 $contact_type = patientcontact::find($contact->contact_id)->getPatientContactType;
                 $contact['contact_type'] = $contact_type->contact_type;
-                $paitent_contact_data = PatientContact::find($contact->contact_id)->getPatientContactData;
+                $paitent_contact_data_col = PatientContact::find($contact->contact_id)->getPatientContactData;
+                //return $paitent_contact_data;
+                unset($var2_array);
+                $var2_array = array();
+                foreach ($paitent_contact_data_col as $paitent_contact_data) {
                 $paitent_contact_data_type = LkupContactDataType::find($paitent_contact_data->contact_data_type_id);
                 $paitent_contact_data['contact_data_type'] = $paitent_contact_data_type->contact_data_type;
-                $contact['contact_data'] = $paitent_contact_data;
+                //$contact['contact_data'] = $paitent_contact_data;
+                $var2_array[] = $paitent_contact_data;
+                }
+                $contact['contact_data'] = $var2_array;
 
                     if (!empty($contact->address_id)) {
                         $contact_address = address::find($contact->address_id);
                         $contact['address']=$contact_address;
                     }
                 $var_array[] = $contact;
-            } catch(\Exception $e) {
+            //} catch(\Exception $e) {
                 //return 'Error Message';
-            }
+            //}
         }
 
         $patient_array['contacts']=$var_array;
@@ -106,6 +114,7 @@ class PatientFullController extends Controller
 
         $array_patient_diagnosis = $patientdiagnosis;
         $array_cancer_type = patientdiagnosis::find($diagnosis_id)->cancer_type;
+        $array_cancer_sub_type = patientdiagnosis::find($diagnosis_id)->cancer_sub_type;
         $array_cell_type = patientdiagnosis::find($diagnosis_id)->cell_type;
         $array_stage = patientdiagnosis::find($diagnosis_id)->stage;
         $array_tumor_site = patientdiagnosis::find($diagnosis_id)->tumor_site;
@@ -113,6 +122,7 @@ class PatientFullController extends Controller
         $array_perfomance_score = patientdiagnosis::find($diagnosis_id)->performance_score;
 
         if (!is_null($array_cancer_type)) {$array_patient_diagnosis['cancer_type_label'] = $array_cancer_type->cancer_type_label;}
+        if (!is_null($array_cancer_sub_type)) {$array_patient_diagnosis['cancer_sub_type_label'] = $array_cancer_sub_type->cancer_sub_type_label;}
         if (!is_null($array_cell_type)) {$array_patient_diagnosis['cell_type_label'] = $array_cell_type->cell_type_label;}
         if (!is_null($array_stage)) {$array_patient_diagnosis['stage_label'] = $array_stage->stage_label;}
         if (!is_null($array_tumor_site)) {$array_patient_diagnosis['tumor_site_label'] = $array_tumor_site->tumor_site_label;}
@@ -124,6 +134,7 @@ class PatientFullController extends Controller
         $treatment = patientdiagnosis::find($diagnosis_id)->treatment;
         $additional = patientdiagnosis::find($diagnosis_id)->additional;
         $remote_site = patientdiagnosis::find($diagnosis_id)->remote_site;
+        $biomarker = patientdiagnosis::find($diagnosis_id)->biomarker;
 
         
 
@@ -161,7 +172,20 @@ class PatientFullController extends Controller
         }
         $patient_array['remote_sites']=$var_array;
 
-        return json_encode($patient_array, JSON_PRETTY_PRINT);
+        $var_array = [];
+        
+        foreach ($biomarker as $biomarker_s){
+            $biomarker_labels = lkuppatientdiagnosisbiomarker::find($biomarker_s->biomarker_id);
+            $biomarker_labels = array($biomarker_labels);
+            foreach ($biomarker_labels as $biomarker_label){
+                $biomarker_s['biomarker_label']=$biomarker_label->biomarker_label;
+            }
+            $var_array[]=$biomarker_s;
+        }
+        $patient_array['biomarkers']=$var_array;
+
+        //return Response(json_encode($patient_array, JSON_PRETTY_PRINT));
+        return $patient_array;
     }
 
 
