@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupPatientDiagnosisTumorSite;
+use App\Http\Controllers\Controller;
+use App\Models\LkupPatientDiagnosisCellType;
 use Illuminate\Http\Request;
 
-class LkupPaitentDiagnosisTumorSiteController extends Controller
+class LkupPatientDiagnosisCellTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,7 @@ class LkupPaitentDiagnosisTumorSiteController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosistumorsite::select('tumor_site_id AS key','tumor_site_label AS value')->get();
+        return lkuppatientdiagnosiscelltype::select('cell_type_id AS key','cell_type_label AS value')->get();;
     }
 
     /**

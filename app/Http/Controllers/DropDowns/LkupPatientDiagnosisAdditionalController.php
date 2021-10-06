@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
+use App\Http\Controllers\Controller;
 use App\Models\LkupPatientDiagnosisAdditional;
 use Illuminate\Http\Request;
 

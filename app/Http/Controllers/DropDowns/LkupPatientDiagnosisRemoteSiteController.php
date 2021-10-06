@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupPatientDiagnosisCellType;
+use App\Http\Controllers\Controller;
+use App\Models\LkupPatientDiagnosisRemoteSite;
 use Illuminate\Http\Request;
 
-class LkupPaitentDiagnosisCellTypeController extends Controller
+class LkupPatientDiagnosisRemoteSiteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,7 @@ class LkupPaitentDiagnosisCellTypeController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosiscelltype::select('cell_type_id AS key','cell_type_label AS value')->get();;
+        return lkuppatientdiagnosisremotesite::select('remote_site_id AS key','remote_site_label AS value')->get();
     }
 
     /**
@@ -60,5 +61,18 @@ class LkupPaitentDiagnosisCellTypeController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+     /**
+     * Search for the specified resource in storage.
+     *
+     * @param  str  $label
+     * @return \Illuminate\Http\Response
+     */
+    public function search($label)
+    {
+        return lkuppatientdiagnosisremotesite::select('remote_site_id AS key','remote_site_label AS value')
+                                                ->where('remote_site_label', 'ilike', $label.'%')
+                                                ->get();
     }
 }

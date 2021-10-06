@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Firebase\JWT\JWK;
-use Firebase\JWT\JWT;
+use App\Helper\Helper;
 
 use Illuminate\Http\Request;
 use App\Models\Patient;
@@ -16,38 +15,16 @@ use Illuminate\Support\Facades\DB;
 
 class SpecialistController extends Controller
 {
-    public function verifyJasonToken(Request $request) {
-        $the_publicKey = config('services.aws.COGNITO_PUBLIC_KEY');
-        $token = $request->bearerToken();
-        $tokenParts = explode(".", $token);  
-        $tokenHeader = base64_decode($tokenParts[0]);
-        $tokenPayload = base64_decode($tokenParts[1]);
-        $jwtHeader = json_decode($tokenHeader);
-        $jwtPayload = json_decode($tokenPayload);
-
-        $the_object = JWT::decode($token,$the_publicKey,['RS256', 'RS256']);
-
-       
-        if ( ($the_object->iss=="https://cognito-idp.".config('services.aws.COGNITO_REGION').".amazonaws.com/".config('services.aws.COGNITO_USER_POOL_ID'))
-            && ($the_object->aud==config('services.aws.COGNITO_CLIENT_ID'))
-            && ($the_object->token_use==config('services.aws.COGNITO_TOKEN'))
-            ) {
-                return $the_object;
-            } else {
-                return ["message"=>"Bad Token"];
-            }
-    }
-
     public function index()
     {
 
         $request = request();
-        //$the_object = self::verifyJasonToken($request);
-        //$patientRecord = patient::where('sub',$the_object->sub)->get();
-        //$addressRecord = address::find($patientRecord[0]['address_id']);
+        $the_object = Helper::verifyJasonToken($request);
+        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $addressRecord = address::find($patientRecord[0]['address_id']);
         $coordinates = DB::table('us')
-                    //->where('zipcode', '=', $addressRecord['address_zip'])
-                    ->where('zipcode', '=', '53534')
+                    ->where('zipcode', '=', $addressRecord['address_zip'])
+                    //->where('zipcode', '=', '53534')
                     ->get();
         
         
@@ -100,7 +77,15 @@ class SpecialistController extends Controller
           //  $record->provider = $provider;
             $record->specialties = $specialties;
          //   $record->provider['metrics'] = $metrics;
-            $record->location = $location;
+         //   $record->location = $location;
+            $record->location_name = $location[0]->location_name;
+            $record->location_address_line_1 = $location[0]->address_line_1;
+            $record->location_address_line_2 = $location[0]->address_line_2;
+            $record->location_city = $location[0]->city;
+            $record->location_state = $location[0]->state;
+            $record->location_postal_code = $location[0]->postal_code;
+            $record->location_country = $location[0]->country;
+            $record->search_result_score = 2;
             $array[] =  $record;
         }
 

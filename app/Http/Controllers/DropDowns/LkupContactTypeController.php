@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupPatientDiagnosisPerformanceScore;
+use App\Http\Controllers\Controller;
+use App\Models\LkupContactType;
 use Illuminate\Http\Request;
 
-class LkupPaitentDiagnosisPerformanceScoreController extends Controller
+class LkupContactTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,8 @@ class LkupPaitentDiagnosisPerformanceScoreController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosisperformancescore::select('performance_score_id AS key','performance_score_label AS value')->get();;
+        //
+        return lkupcontacttype::select('contact_type_id AS key','contact_type AS value')->get();
     }
 
     /**
@@ -37,6 +39,8 @@ class LkupPaitentDiagnosisPerformanceScoreController extends Controller
     public function show($id)
     {
         //
+        $lkupcontacttype = lkupcontacttype::find($id);
+        return $lkupcontacttype;
     }
 
     /**

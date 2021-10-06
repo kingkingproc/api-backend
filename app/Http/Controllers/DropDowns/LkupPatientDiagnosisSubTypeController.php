@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupContactDataType;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\LkupPatientDiagnosisCancerSubType;
 
-class LkupContactDataTypeController extends Controller
+class LkupPatientDiagnosisSubTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +15,7 @@ class LkupContactDataTypeController extends Controller
      */
     public function index()
     {
-        //
-        return lkupcontactdatatype::select('contact_data_type_id AS key','contact_data_type AS value')->get();
+        return lkuppatientdiagnosiscancersubtype::select('cancer_sub_type_id AS key','cancer_sub_type_label AS value','cancer_type_id AS type_key')->get();
     }
 
     /**
@@ -38,8 +38,6 @@ class LkupContactDataTypeController extends Controller
     public function show($id)
     {
         //
-        $lkupcontactdatatype = lkupcontactdatatype::find($id);
-        return $lkupcontactdatatype;
     }
 
     /**
@@ -63,5 +61,12 @@ class LkupContactDataTypeController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function search($label)
+    {
+        return lkuppatientdiagnosiscancersubtype::select('cancer_sub_type_id AS key','cancer_sub_type_label AS value')
+                                                ->where('cancer_type_id', '=', $label)
+                                                ->get();
     }
 }

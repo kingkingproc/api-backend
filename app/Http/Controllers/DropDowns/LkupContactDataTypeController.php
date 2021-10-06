@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupPatientEthnicity;
+use App\Http\Controllers\Controller;
+use App\Models\LkupContactDataType;
 use Illuminate\Http\Request;
 
-class LkupPatientEthnicityController extends Controller
+class LkupContactDataTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,10 +15,8 @@ class LkupPatientEthnicityController extends Controller
      */
     public function index()
     {
-        //return lkuppatientethnicity::all();
-
-        return lkuppatientethnicity::select('ethnicity_id AS key','ethnicity_label AS value')->get();
-
+        //
+        return lkupcontactdatatype::select('contact_data_type_id AS key','contact_data_type AS value')->get();
     }
 
     /**
@@ -40,6 +39,8 @@ class LkupPatientEthnicityController extends Controller
     public function show($id)
     {
         //
+        $lkupcontactdatatype = lkupcontactdatatype::find($id);
+        return $lkupcontactdatatype;
     }
 
     /**

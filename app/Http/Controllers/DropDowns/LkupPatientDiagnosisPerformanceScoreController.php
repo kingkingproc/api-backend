@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupPatientDiagnosisRemoteSite;
+use App\Http\Controllers\Controller;
+use App\Models\LkupPatientDiagnosisPerformanceScore;
 use Illuminate\Http\Request;
 
-class LkupPatientDiagnosisRemoteSiteController extends Controller
+class LkupPatientDiagnosisPerformanceScoreController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,7 @@ class LkupPatientDiagnosisRemoteSiteController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosisremotesite::select('remote_site_id AS key','remote_site_label AS value')->get();
+        return lkuppatientdiagnosisperformancescore::select('performance_score_id AS key','performance_score_label AS value')->get();;
     }
 
     /**
@@ -60,18 +61,5 @@ class LkupPatientDiagnosisRemoteSiteController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-     /**
-     * Search for the specified resource in storage.
-     *
-     * @param  str  $label
-     * @return \Illuminate\Http\Response
-     */
-    public function search($label)
-    {
-        return lkuppatientdiagnosisremotesite::select('remote_site_id AS key','remote_site_label AS value')
-                                                ->where('remote_site_label', 'ilike', $label.'%')
-                                                ->get();
     }
 }

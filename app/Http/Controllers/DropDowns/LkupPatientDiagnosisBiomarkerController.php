@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupContactType;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\LkupPatientDiagnosisBiomarker;
 
-class LkupContactTypeController extends Controller
+class LkupPatientDiagnosisBiomarkerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +15,7 @@ class LkupContactTypeController extends Controller
      */
     public function index()
     {
-        //
-        return lkupcontacttype::select('contact_type_id AS key','contact_type AS value')->get();
+        return lkuppatientdiagnosisbiomarker::select('biomarker_id AS key','biomarker_label AS value')->get();
     }
 
     /**
@@ -38,8 +38,6 @@ class LkupContactTypeController extends Controller
     public function show($id)
     {
         //
-        $lkupcontacttype = lkupcontacttype::find($id);
-        return $lkupcontacttype;
     }
 
     /**

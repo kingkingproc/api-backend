@@ -30,8 +30,8 @@ Route::resource('patient','App\Http\Controllers\PatientController');
 
 Route::resource('patientcontact','App\Http\Controllers\PatientContactController');
 Route::resource('patientcontactdata','App\Http\Controllers\PatientContactDataController');
-Route::resource('lkupcontactdatatype','App\Http\Controllers\LkupContactDataTypeController');
-Route::resource('lkupcontacttype','App\Http\Controllers\LkupContactTypeController');
+Route::resource('lkupcontactdatatype','App\Http\Controllers\DropDowns\LkupContactDataTypeController');
+Route::resource('lkupcontacttype','App\Http\Controllers\DropDowns\LkupContactTypeController');
 
 Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController');
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
@@ -44,7 +44,7 @@ Route::put('/patientprofile','App\Http\Controllers\PatientProfileController@upda
 Route::put('/patientprofilediagnosis','App\Http\Controllers\PatientProfileDiagnosisController@update');
 Route::put('/patientprofiledoctors','App\Http\Controllers\PatientProfileDoctersController@update');
 
-
+Route::get('/searchtrialresult','App\Http\Controllers\TrialController@index');
 Route::get('/trialresult','App\Http\Controllers\TestController@index');
 Route::get('/specialistresult','App\Http\Controllers\SpecialistController@index');
 
@@ -59,25 +59,25 @@ Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');
 
 
 // routes to lookup table, which have no creates or updates (for select form fields)
-Route::resource('lkuppatientethnicity','App\Http\Controllers\LkupPatientEthnicityController');
-Route::resource('lkuppatientdiagnosistreatment','App\Http\Controllers\LkupPatientDiagnosisTreatmentController');
-Route::resource('lkuppatientdiagnosisadditional','App\Http\Controllers\LkupPatientDiagnosisAdditionalController');
-Route::resource('lkuppatientdiagnosisremotesite','App\Http\Controllers\LkupPatientDiagnosisRemoteSiteController');
-Route::resource('lkuppatientdiagnosiscancerstage','App\Http\Controllers\LkupPaitentDiagnosisCancerStageController');
-Route::resource('lkuppatientdiagnosiscancertype','App\Http\Controllers\LkupPaitentDiagnosisCancerTypeController');
-Route::resource('lkuppatientdiagnosiscelltype','App\Http\Controllers\LkupPaitentDiagnosisCellTypeController');
-Route::resource('lkuppatientdiagnosisscore','App\Http\Controllers\LkupPaitentDiagnosisPerformanceScoreController');
-Route::resource('lkuppatientdiagnosistumorsite','App\Http\Controllers\LkupPaitentDiagnosisTumorSiteController');
-Route::resource('lkuppatientdiagnosistumorsize','App\Http\Controllers\LkupPaitentDiagnosisTumorSizeController');
-Route::resource('lkuppatientdiagnosisbiomarker','App\Http\Controllers\LkupPatientDiagnosisBiomarkerController');
-Route::resource('lkuppatientdiagnosissubtype','App\Http\Controllers\LkupPatientDiagnosisSubTypeController');
+Route::resource('lkuppatientethnicity','App\Http\Controllers\DropDowns\LkupPatientEthnicityController');
+Route::resource('lkuppatientdiagnosistreatment','App\Http\Controllers\DropDowns\LkupPatientDiagnosisTreatmentController');
+Route::resource('lkuppatientdiagnosisadditional','App\Http\Controllers\DropDowns\LkupPatientDiagnosisAdditionalController');
+Route::resource('lkuppatientdiagnosisremotesite','App\Http\Controllers\DropDowns\LkupPatientDiagnosisRemoteSiteController');
+Route::resource('lkuppatientdiagnosiscancerstage','App\Http\Controllers\DropDowns\LkupPatientDiagnosisCancerStageController');
+Route::resource('lkuppatientdiagnosiscancertype','App\Http\Controllers\DropDowns\LkupPatientDiagnosisCancerTypeController');
+Route::resource('lkuppatientdiagnosiscelltype','App\Http\Controllers\DropDowns\LkupPatientDiagnosisCellTypeController');
+Route::resource('lkuppatientdiagnosisscore','App\Http\Controllers\DropDowns\LkupPatientDiagnosisPerformanceScoreController');
+Route::resource('lkuppatientdiagnosistumorsite','App\Http\Controllers\DropDowns\LkupPatientDiagnosisTumorSiteController');
+Route::resource('lkuppatientdiagnosistumorsize','App\Http\Controllers\DropDowns\LkupPatientDiagnosisTumorSizeController');
+Route::resource('lkuppatientdiagnosisbiomarker','App\Http\Controllers\DropDowns\LkupPatientDiagnosisBiomarkerController');
+Route::resource('lkuppatientdiagnosissubtype','App\Http\Controllers\DropDowns\LkupPatientDiagnosisSubTypeController');
 
 
 // search routes for auto complete fields
-Route::get('/lkuppatientdiagnosisadditional/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisAdditionalController', 'search']);
-Route::get('/lkuppatientdiagnosistreatment/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisTreatmentController', 'search']);
-Route::get('/lkuppatientdiagnosisremotesite/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisRemoteSiteController', 'search']);
-Route::get('/lkuppatientdiagnosissubtype/search/{label}',['App\Http\Controllers\LkupPatientDiagnosisSubTypeController', 'search']);
+Route::get('/lkuppatientdiagnosisadditional/search/{label}',['App\Http\Controllers\DropDowns\LkupPatientDiagnosisAdditionalController', 'search']);
+Route::get('/lkuppatientdiagnosistreatment/search/{label}',['App\Http\Controllers\DropDowns\LkupPatientDiagnosisTreatmentController', 'search']);
+Route::get('/lkuppatientdiagnosisremotesite/search/{label}',['App\Http\Controllers\DropDowns\LkupPatientDiagnosisRemoteSiteController', 'search']);
+Route::get('/lkuppatientdiagnosissubtype/search/{label}',['App\Http\Controllers\DropDowns\LkupPatientDiagnosisSubTypeController', 'search']);
 
 
 /*

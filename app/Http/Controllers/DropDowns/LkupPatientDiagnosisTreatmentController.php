@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\DropDowns;
 
-use App\Models\LkupPatientDiagnosisTumorSize;
+use App\Http\Controllers\Controller;
+use App\Models\LkupPatientDiagnosisTreatment;
 use Illuminate\Http\Request;
 
-class LkupPaitentDiagnosisTumorSizeController extends Controller
+class LkupPatientDiagnosisTreatmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,7 @@ class LkupPaitentDiagnosisTumorSizeController extends Controller
      */
     public function index()
     {
-        return lkuppatientdiagnosistumorsize::select('tumor_size_id AS key','tumor_size_label AS value')->get();
+        return lkuppatientdiagnosistreatment::select('treatment_id AS key','treatment_label AS value')->get();
     }
 
     /**
@@ -60,5 +61,18 @@ class LkupPaitentDiagnosisTumorSizeController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * Search for the specified resource in storage.
+     *
+     * @param  str  $label
+     * @return \Illuminate\Http\Response
+     */
+    public function search($label)
+    {
+        return lkuppatientdiagnosistreatment::select('treatment_id AS key','treatment_label AS value')
+                                                ->where('treatment_label', 'ilike', $label.'%')
+                                                ->get();
     }
 }
