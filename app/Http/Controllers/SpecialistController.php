@@ -43,7 +43,7 @@ class SpecialistController extends Controller
         ->select('specialists_melanoma.provider_id', 'specialists_melanoma.location_id', 
         'specialists_melanoma.provider_name', 'specialists_melanoma.publications_adj',
         'specialists_melanoma.max_citations_adj', 'specialists_melanoma.h_index_adj',
-        'specialists_melanoma.trial_count_adj',
+        'specialists_melanoma.trial_count_adj', 'specialists_melanoma.coe_flag',
         'us.zipcode', DB::raw("6371 * acos(cos(radians(" . $fLatitude . "))
         * cos(radians(us.latitude)) 
         * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 

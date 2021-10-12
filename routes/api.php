@@ -55,7 +55,7 @@ Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisControl
 Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');
 
 
-
+Route::put('usertrace','App\Http\Controllers\UserTraceController@store');
 
 
 // routes to lookup table, which have no creates or updates (for select form fields)

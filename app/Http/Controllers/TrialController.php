@@ -72,6 +72,7 @@ class TrialController extends Controller
             //return $locationResults;
 
             $record->trial_title = $trialResults[0]->brief_title;
+            $record->trial_summary = $trialResults[0]->brief_summary;
             $record->trial_status = $trialResults[0]->current_trial_status;
             $record->phase = $trialResults[0]->phase;
             $record->stage = $trialResults[0]->stages;
