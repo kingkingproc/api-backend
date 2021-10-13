@@ -73,7 +73,7 @@ class TrialController extends Controller
 
             $record->trial_title = $trialResults[0]->brief_title;
             $record->trial_summary = $trialResults[0]->brief_summary;
-            $record->trial_status = $trialResults[0]->current_trial_status;
+            $record->trial_status = $trialResults[0]->status_mapped;
             $record->phase = $trialResults[0]->phase;
             $record->stage = $trialResults[0]->stages;
             $record->ecog = $trialResults[0]->ecog_values;
