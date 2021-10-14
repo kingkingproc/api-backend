@@ -54,13 +54,23 @@ class SpecialistController extends Controller
         ->get();
 
         //return $testResults;
+        $providerList = [];
 
         foreach($testResults as $record) {
+            if (in_array($record->provider_id, $providerList)) {
+                continue;
+            }
+            array_push($providerList,$record->provider_id);
             //$provider = DB::connection('pgsql2')->select('select * from provider
             //where provider.provider_id = ?',array($record->provider_id));
 
             $location = DB::connection('pgsql2')->select('select * from location
             where location.location_id = ?',array($record->location_id));
+
+            $all_location = DB::connection('pgsql2')->select('select * from location
+            where location.location_id in (select location_id
+                from provider_location_ref where provider_id = ?
+                and location_id <> ?)',array($record->provider_id,$record->location_id));
 
             $specialties = DB::connection('pgsql2')->select("select 'pri_specialty' as spec_type, specialty_name from provider_primary_specialty_ref as ppsr
             inner join specialty as s on ppsr.specialty_id = s.specialty_id
@@ -86,6 +96,7 @@ class SpecialistController extends Controller
             $record->location_postal_code = $location[0]->postal_code;
             $record->location_country = $location[0]->country;
             $record->search_result_score = 2;
+            $record->all_location = $all_location;
             $array[] =  $record;
         }
 
