@@ -75,6 +75,7 @@ class TrialController extends Controller
             $record->trial_summary = $trialResults[0]->brief_summary;
             $record->trial_status = $trialResults[0]->status_mapped;
             $record->nci_id = $trialResults[0]->nci_id;
+            $record->nct_id = $trialResults[0]->nct_id;
             $record->phase = $trialResults[0]->phase;
             $record->stage = $trialResults[0]->stages;
             $record->ecog = $trialResults[0]->ecog_values;
