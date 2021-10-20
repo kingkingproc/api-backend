@@ -83,7 +83,7 @@ class SpecialistController extends Controller
            // $metrics = DB::connection('pgsql2')->select('select * from provider_metric_view
            // where provider_metric_view.provider_id = ?',array($record->provider_id));
 
-
+           $record->coe_flag = var_export($record->coe_flag, true);
           //  $record->provider = $provider;
             $record->specialties = $specialties;
          //   $record->provider['metrics'] = $metrics;

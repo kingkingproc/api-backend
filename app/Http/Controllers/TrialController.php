@@ -26,7 +26,7 @@ class TrialController extends Controller
         $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
         $searchTerm = $cancerTypeRecord[0]['cancer_type_label'];
         $cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
-        $searchSubTerm = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
+        //$searchSubTerm = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
 
         $searchPhase = $diagnosisRecord[0]->performance_score_id;
         $searchEcog = $diagnosisRecord[0]->performance_score_id;
@@ -74,6 +74,7 @@ class TrialController extends Controller
             $record->trial_title = $trialResults[0]->brief_title;
             $record->trial_summary = $trialResults[0]->brief_summary;
             $record->trial_status = $trialResults[0]->status_mapped;
+            $record->nci_id = $trialResults[0]->nci_id;
             $record->phase = $trialResults[0]->phase;
             $record->stage = $trialResults[0]->stages;
             $record->ecog = $trialResults[0]->ecog_values;
