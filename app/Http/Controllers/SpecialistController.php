@@ -84,6 +84,8 @@ class SpecialistController extends Controller
            // where provider_metric_view.provider_id = ?',array($record->provider_id));
 
            $record->coe_flag = var_export($record->coe_flag, true);
+           if ($record->coe_flag === "true") {$record->coe_flag = "Yes";}
+           if ($record->coe_flag === "false") {$record->coe_flag = "No";}
           //  $record->provider = $provider;
             $record->specialties = $specialties;
          //   $record->provider['metrics'] = $metrics;
