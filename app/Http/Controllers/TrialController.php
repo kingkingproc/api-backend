@@ -54,13 +54,19 @@ class TrialController extends Controller
         * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
         + sin(radians(" .$fLatitude. ")) 
         * sin(radians(us.latitude))) AS distance"))
-        ->orderBy('distance', 'asc')
-        ->limit(100)
+        ->orderBy('trial_id', 'asc')
+        ->limit(300)
         ->get();
 
         //return $testResults;
+        $trialList = [];
 
         foreach($testResults as $record) {
+            if (in_array($record->trial_id, $trialList)) {
+                continue;
+            }
+            array_push($trialList,$record->trial_id);
+
             $trialResults = DB::connection('pgsql2')->select('select * from trial
             where trial.trial_id = ?',array($record->trial_id));
 
@@ -100,43 +106,66 @@ class TrialController extends Controller
             where contact.contact_id = trial_contact_ref.contact_id
             and trial_contact_ref.trial_id = ?',array($record->trial_id));
 
-            /*
-            $conditions = DB::connection('pgsql2')->select('select * from trial_disease, trial_disease_ref
-            where trial_disease.trial_disease_id = trial_disease_ref.trial_disease_id
-            and trial_disease_ref.trial_id = ? limit 3',array($record->trial_id));
-            */
-
+            
+            $conditions = DB::connection('pgsql')->select('select disease_count  from trial_disease_count
+            where trial_disease_count.trial_id = ?',array($record->trial_id));
+            
+            $record->disease_count = $conditions[0]->disease_count;
+            //$record->disease_count = [];
             $record->professional_data = $professionals;
             $record->collaborator_data = $collaborators;
             $record->contact_data = $contacts;
+            //$record->contact_data = [];
             $record->disease_data = [];
             $record->related_location_data = [];
-            $record->search_result_score = 2;
+            $record->search_result_score = 4.0;
+            $record->search_result_string = "Matching-";
             
-            $myArr = ["active", "available", "recruiting", "enrolling by invitation"];
+            $myArr = ["open", "active", "available", "recruiting", "enrolling by invitation"];
 
             //if (stripos($record->disease_data, $searchSubTerm)) {
             //    $record->search_result_score = $record->search_result_score+1;
             //}
             if (stripos($record->trial_title, $searchTerm)) {
-                $record->search_result_score = $record->search_result_score+1;
+                $record->search_result_score = $record->search_result_score+2.0;
+                $record->search_result_string = $record->search_result_string . "-Title";
             }
-            if (in_array(strtolower($record->trial_status),$myArr)) {
-                $record->search_result_score = $record->search_result_score+1;
-            }
+            //if (stripos($record->trial_summary, $searchTerm)) {
+            //    $record->search_result_score = $record->search_result_score+2.0;
+            //    $record->search_result_string = $record->search_result_string . "-Body";
+            //}
+
+            //if (in_array(strtolower($record->trial_status),$myArr)) {
+            //    $record->search_result_score = $record->search_result_score+1.0;
+            //    $record->search_result_string = $record->search_result_string . "-Status";
+            //}
             //json_decode(json_encode($record->phase), true)
+            
             //if (stripos($record->phase, $searchPhase)) {
-            if (stripos($record->phase, $searchPhase)) {
-                $record->search_result_score = $record->search_result_score+1;
-            }
+            //    $record->search_result_score = $record->search_result_score+1.0;
+            //    $record->search_result_string = $record->search_result_string . "-Phase";
+            //}
             $record->phase = json_decode($record->phase);
 
             if (stripos($record->stage, $searchStage)) {
-                $record->search_result_score = $record->search_result_score+1;
+                $record->search_result_score = $record->search_result_score+2.0;
+                $record->search_result_string = $record->search_result_string . "-Stage";
             }
             if (stripos($record->ecog, $searchEcog)) {
-                $record->search_result_score = $record->search_result_score+1;
+                $record->search_result_score = $record->search_result_score+2.0;
+                $record->search_result_string = $record->search_result_string . "-Ecog";
             }
+            /*
+            if ($record->disease_count < 500) {
+            $record->search_result_score = $record->search_result_score+1.0;
+            $record->search_result_string = $record->search_result_string . "-Count";
+            }
+            if ($record->disease_count < 100) {
+                $record->search_result_score = $record->search_result_score+1.0;
+                $record->search_result_string = $record->search_result_string . "-LowCount";
+                }  
+            */  
+           $record->search_result_score = $record->search_result_score/2;
             if ($record->search_result_score > 5) {
                 $record->search_result_score = 5;
             }

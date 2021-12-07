@@ -61,8 +61,8 @@ class SpecialistController extends Controller
                 continue;
             }
             array_push($providerList,$record->provider_id);
-            //$provider = DB::connection('pgsql2')->select('select * from provider
-            //where provider.provider_id = ?',array($record->provider_id));
+            $provider = DB::connection('pgsql2')->select('select last_name from provider
+            where provider.provider_id = ?',array($record->provider_id));
 
             $location = DB::connection('pgsql2')->select('select * from location
             where location.location_id = ?',array($record->location_id));
@@ -72,6 +72,13 @@ class SpecialistController extends Controller
                 from provider_location_ref where provider_id = ?
                 and location_id <> ?)',array($record->provider_id,$record->location_id));
 
+            $all_open_trials = DB::connection('pgsql2')->select ("select t.nci_id, t.nct_id, tpr.role, t.status_mapped from
+            trial t
+            inner join trial_professional_ref tpr on tpr.trial_id = t.trial_id
+            inner join provider_trial_professional_ref ptpr on ptpr.trial_professional_id = tpr.trial_professional_id
+            inner join provider p on p.provider_id = ptpr.provider_id
+            where p.provider_id = ?",array($record->provider_id));
+            
             $specialties = DB::connection('pgsql2')->select("select 'pri_specialty' as spec_type, specialty_name from provider_primary_specialty_ref as ppsr
             inner join specialty as s on ppsr.specialty_id = s.specialty_id
             where ppsr.provider_id = ?
@@ -97,8 +104,56 @@ class SpecialistController extends Controller
             $record->location_state = $location[0]->state;
             $record->location_postal_code = $location[0]->postal_code;
             $record->location_country = $location[0]->country;
-            $record->search_result_score = 2;
+            $record->last_name = $provider[0]->last_name;
+            $record->search_result_score = 0.00;
             $record->all_location = $all_location;
+            $record->all_trials = $all_open_trials;
+
+            $trial_count_score = 0.00;
+            $h_count_score = 0.00;
+
+            if ($record->trial_count_adj == 0) {
+                $trial_count_score = 1.00;
+            }
+            if ($record->trial_count_adj == 1) {
+                $trial_count_score = 2.00;
+            }
+            if ($record->trial_count_adj == 2) {
+                $trial_count_score = 3.00;
+            }
+            if ($record->trial_count_adj == 3) {
+                $trial_count_score = 3.00;
+            }
+            if ($record->trial_count_adj == 4) {
+                $trial_count_score = 4.00;
+            }
+            if ($record->trial_count_adj == 5) {
+                $trial_count_score = 4.00;
+            }
+            if ($record->trial_count_adj == 6) {
+                $trial_count_score = 4.00;
+            }
+            if ($record->trial_count_adj > 6) {
+                $trial_count_score = 5.00;
+            }
+            if ($record->h_index_adj <= 2.00) {
+                $h_count_score = 1.00;
+            }
+            if ($record->h_index_adj > 2.00 and $record->h_index_adj <= 6.00) {
+                $h_count_score = 2.00;
+            }
+            if ($record->h_index_adj > 6.00 and $record->h_index_adj <= 20.00) {
+                $h_count_score = 3.00;
+            }
+            if ($record->h_index_adj > 20.00 and $record->h_index_adj <= 63.00) {
+                $h_count_score = 4.00;
+            }
+            if ($record->h_index_adj > 63.00) {
+                $h_count_score = 5.00;
+            }
+
+            $record->search_result_score = ($trial_count_score + $h_count_score)/2;
+            //$record->search_result_score = '<img src="/bar.png"/>';
             $array[] =  $record;
         }
 
