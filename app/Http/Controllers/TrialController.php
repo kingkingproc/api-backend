@@ -45,7 +45,7 @@ class TrialController extends Controller
         $fRadius = (float)50;
         $fLatitude = (float)$tempLat;
         $fLongitude = (float)$tempLong;
-
+/*  Good Query
         $testResults = DB::table("trials_melanoma")
         ->join('us', 'us.zipcode', '=', 'trials_melanoma.postal_code')
         ->select('trials_melanoma.*',
@@ -54,18 +54,47 @@ class TrialController extends Controller
         * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
         + sin(radians(" .$fLatitude. ")) 
         * sin(radians(us.latitude))) AS distance"))
-        ->orderBy('trial_id', 'asc')
-        ->limit(300)
+        ->orderBy('distance', 'asc')
+        ->limit(100)
         ->get();
+*/
 
+$testResults = DB::select(DB::raw(" 
+                with cte_no_location as (
+                    select trials_melanoma.trial_id, MIN(
+                    6371 * acos(cos(radians(" . $fLatitude . "))
+                            * cos(radians(us.latitude)) 
+                            * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
+                            + sin(radians(" . $fLatitude . ")) 
+                            * sin(radians(us.latitude)))) AS distance
+                    from trials_melanoma inner join us on trials_melanoma.postal_code = us.zipcode
+                    group by trials_melanoma.trial_id
+                    ),
+                    cte_location as (
+                    select trials_melanoma.trial_id, trials_melanoma.location_id,
+                    6371 * acos(cos(radians(" . $fLatitude . "))
+                            * cos(radians(us.latitude)) 
+                            * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
+                            + sin(radians(" . $fLatitude . ")) 
+                            * sin(radians(us.latitude))) AS distance
+                    from trials_melanoma inner join us on trials_melanoma.postal_code = us.zipcode
+                    )
+                    select cte_no_location.trial_id, cte_no_location.distance, cte_location.location_id
+                    from cte_no_location inner join cte_location on cte_no_location.trial_id = cte_location.trial_id
+                        and cte_no_location.distance = cte_location.distance
+                    order by cte_no_location.distance
+                    limit 200"
+                ));
         //return $testResults;
         $trialList = [];
 
+        //$testResults = $testResults->sortBy('trial_id');
+
         foreach($testResults as $record) {
-            if (in_array($record->trial_id, $trialList)) {
-                continue;
-            }
-            array_push($trialList,$record->trial_id);
+           // if (in_array($record->trial_id, $trialList)) {
+           //     continue;
+           // }
+           // array_push($trialList,$record->trial_id);
 
             $trialResults = DB::connection('pgsql2')->select('select * from trial
             where trial.trial_id = ?',array($record->trial_id));
@@ -78,7 +107,7 @@ class TrialController extends Controller
             //return $locationResults;
 
             $record->trial_title = $trialResults[0]->brief_title;
-            $record->trial_summary = $trialResults[0]->brief_summary;
+            $record->trial_summary = ""; //$trialResults[0]->brief_summary;
             $record->trial_status = $trialResults[0]->status_mapped;
             $record->nci_id = $trialResults[0]->nci_id;
             $record->nct_id = $trialResults[0]->nct_id;
