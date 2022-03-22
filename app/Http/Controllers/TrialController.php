@@ -136,11 +136,11 @@ $testResults = DB::select(DB::raw("
             and trial_contact_ref.trial_id = ?',array($record->trial_id));
 
             
-            $conditions = DB::connection('pgsql')->select('select disease_count  from trial_disease_count
-            where trial_disease_count.trial_id = ?',array($record->trial_id));
+            //$conditions = DB::connection('pgsql')->select('select disease_count  from trial_disease_count
+            //where trial_disease_count.trial_id = ?',array($record->trial_id));
             
-            $record->disease_count = $conditions[0]->disease_count;
-            //$record->disease_count = [];
+            //$record->disease_count = $conditions[0]->disease_count;
+            $record->disease_count = [];
             $record->professional_data = $professionals;
             $record->collaborator_data = $collaborators;
             $record->contact_data = $contacts;
