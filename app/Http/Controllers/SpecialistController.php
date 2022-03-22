@@ -153,7 +153,7 @@ class SpecialistController extends Controller
             }
 
             $record->search_result_score = ($trial_count_score + $h_count_score)/2;
-            //$record->search_result_score = '<img src="/bar.png"/>';
+            //$record->search_result_score = ''<img src="bar.png">'';
             $array[] =  $record;
         }
 
