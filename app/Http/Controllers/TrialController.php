@@ -83,7 +83,7 @@ $testResults = DB::select(DB::raw("
                     from cte_no_location inner join cte_location on cte_no_location.trial_id = cte_location.trial_id
                         and cte_no_location.distance = cte_location.distance
                     order by cte_no_location.distance
-                    limit 100"
+                    limit 1000"
                 ));
         //return $testResults;
         $trialList = [];
