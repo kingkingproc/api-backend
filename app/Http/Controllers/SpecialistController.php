@@ -50,7 +50,7 @@ class SpecialistController extends Controller
         + sin(radians(" .$fLatitude. ")) 
         * sin(radians(us.latitude))) AS distance"))
         ->orderBy('distance', 'asc')
-        ->limit(200)
+        ->limit(500)
         ->get();
 
         //return $testResults;
