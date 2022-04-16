@@ -21,15 +21,15 @@ class TestController extends Controller
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
         $patientRecord = patient::where('sub',$the_object->sub)->get();
-        //$diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
-        //$cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
-        //$searchType = $cancerTypeRecord[0]['cancer_type_label'];
+        $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
+        $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
+        $searchType = $cancerTypeRecord[0]['cancer_type_label'];
         //$cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
         //$searchSubType = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
 
-        //$searchPhase = $diagnosisRecord[0]->performance_score_id;
-        //$searchEcog = $diagnosisRecord[0]->performance_score_id;
-        //$searchStage = $diagnosisRecord[0]->stage_id;
+        $searchPhase = $diagnosisRecord[0]->performance_score_id;
+        $searchEcog = $diagnosisRecord[0]->performance_score_id;
+        $searchStage = $diagnosisRecord[0]->stage_id;
 
         $addressRecord = address::find($patientRecord[0]['address_id']);
 
@@ -69,8 +69,6 @@ class TestController extends Controller
     foreach($testResults as $record) {
 
         $record->trial_summary = "";
-        $record->nci_id = "";
-        $record->nct_id = "";
 
         $record->location_address_line_1 = "";
         $record->location_address_line_2 = "";
@@ -88,7 +86,25 @@ class TestController extends Controller
         $record->related_location_data = [];
         $record->search_result_score = 4.0;
         $record->search_result_string = "Matching-";
+        $record->phase = json_decode($record->phase);
 
+        if (stripos($record->trial_title, $searchType)) {
+            $record->search_result_score = $record->search_result_score+2.0;
+            $record->search_result_string = $record->search_result_string . "-Title";
+        }
+        if (stripos($record->stage, $searchStage)) {
+            $record->search_result_score = $record->search_result_score+2.0;
+            $record->search_result_string = $record->search_result_string . "-Stage";
+        }
+        if (stripos($record->ecog, $searchEcog)) {
+            $record->search_result_score = $record->search_result_score+2.0;
+            $record->search_result_string = $record->search_result_string . "-Ecog";
+        }
+
+        $record->search_result_score = $record->search_result_score/2;
+        if ($record->search_result_score > 5) {
+            $record->search_result_score = 5;
+        }
         $array[] =  $record;
      }
 
