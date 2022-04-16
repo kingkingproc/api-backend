@@ -56,7 +56,10 @@ class TestController extends Controller
                     * sin(radians(us.latitude))) AS distance
             from cte_lat_long,trials_melanoma inner join us on trials_melanoma.postal_code = us.zipcode
             )
-            select cte_no_location.trial_id, cte_no_location.distance, cte_location.location_id, trial.brief_title as trial_title, trial.phase, trial.ecog_values as ecog, trial.stages as stage, location.location_name
+            select cte_no_location.trial_id, cte_no_location.distance, cte_location.location_id, 
+            trial.brief_title as trial_title, trial.phase, trial.ecog_values as ecog, 
+            trial.stages as stage, trial.status_mapped as trial_status, trial.nci_id, trial.nct_id,
+            location.location_name
             from cte_no_location inner join cte_location on cte_no_location.trial_id = cte_location.trial_id
                 and cte_no_location.distance = cte_location.distance
             inner join trial on cte_no_location.trial_id = trial.trial_id
@@ -66,7 +69,6 @@ class TestController extends Controller
     foreach($testResults as $record) {
 
         $record->trial_summary = "";
-        $record->trial_status = "Open";
         $record->nci_id = "";
         $record->nct_id = "";
 
