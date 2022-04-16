@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Helper\Helper;
 
 use Illuminate\Http\Request;
-use App\Models\Trial;
 use App\Models\Patient;
 use App\Models\PatientDiagnosis;
 use App\Models\LkupPatientDiagnosisCancerType;
 use App\Models\LkupPatientDiagnosisCancerSubType;
 use App\Models\address;
-use App\Models\SelectisTrial;
-use App\Models\SelectisLocation;
+
+
 use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller
@@ -22,142 +21,76 @@ class TestController extends Controller
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
         $patientRecord = patient::where('sub',$the_object->sub)->get();
-        $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
-        $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
-        $searchTerm = $cancerTypeRecord[0]['cancer_type_label'];
-        if ($searchTerm != "Melanoma") {
-            return ["message"=>"Wrong Cancer Type"];
-        }
-        $cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
-        $searchSubTerm = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
-        //$patientPhase = $patientRecord[0]['performance_score_id'];
+        //$diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
+        //$cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
+        //$searchType = $cancerTypeRecord[0]['cancer_type_label'];
+        //$cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
+        //$searchSubType = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
+
+        //$searchPhase = $diagnosisRecord[0]->performance_score_id;
+        //$searchEcog = $diagnosisRecord[0]->performance_score_id;
+        //$searchStage = $diagnosisRecord[0]->stage_id;
+
         $addressRecord = address::find($patientRecord[0]['address_id']);
-        //return $patientRecord;
-        $patientPhase = DB::table('patient_diagnoses')
-                    ->select('performance_score_id')
-                    ->where('patient_id', '=', $patientRecord[0]['patient_id'])
-                    ->get();
-        $searchPhase = $patientPhase[0]->performance_score_id;
 
-        $coordinates = DB::table('us')
-                    ->where('zipcode', '=', $addressRecord['address_zip'])
-                    ->get();
-        
-        
-        //return $coordinates;
-        $tempLat = $coordinates[0]->latitude;
-        $tempLong = $coordinates[0]->longitude;
-        
-        //works
-
-        $fRadius = (float)50;
-        $fLatitude = (float)$tempLat;
-        $fLongitude = (float)$tempLong;
-/*
-        $sXprDistance =  "SQRT(POWER(($fLatitude-latitude)*110.7,2)+POWER(($fLongitude-longitude)*75.6,2))";
-        $sql = "select trials_test.*, us.zipcode, $sXprDistance AS distance  FROM us, trials_test WHERE $sXprDistance <= '$fRadius' and us.zipcode = trials_test.postal_code ORDER BY distance ASC";
-        $radiusResults = DB::select($sql);
-
-*/
-$testResults = DB::table("trial_melanoma")
-    ->join('us', 'us.zipcode', '=', 'trial_melanoma.postal_code')
-    ->select('trial_melanoma.*', 'us.zipcode', DB::raw("6371 * acos(cos(radians(" . $fLatitude . "))
-    * cos(radians(us.latitude)) 
-    * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
-    + sin(radians(" .$fLatitude. ")) 
-    * sin(radians(us.latitude))) AS distance"))
-    ->where(DB::raw("6371 * acos(cos(radians(" . $fLatitude . "))
-    * cos(radians(us.latitude)) 
-    * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
-    + sin(radians(" .$fLatitude. ")) 
-    * sin(radians(us.latitude)))"), '<=', $fRadius)
-    ->orderBy('distance', 'asc')
-    ->limit(100)
-    ->get();
-
-    $myArr = ["active", "available", "recruiting", "enrolling by invitation"];
-/*
-    if ($testResults = "[]") {
-        return ["message"=>"Empty Results"];
-    }
-*/
+        $testResults = DB::connection('pgsql2')->select("
+        with cte_lat_long as (
+            select latitude,longitude from us where zipcode = '". $addressRecord['address_zip'] ."'
+            )
+            , cte_no_location as (
+            select trials_melanoma.trial_id, MIN(
+            6371 * acos(cos(radians(cte_lat_long.latitude))
+                    * cos(radians(us.latitude)) 
+                    * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
+                    + sin(radians(cte_lat_long.latitude)) 
+                    * sin(radians(us.latitude)))) AS distance
+            from cte_lat_long,trials_melanoma inner join us on trials_melanoma.postal_code = us.zipcode
+            group by trials_melanoma.trial_id
+            ),
+            cte_location as (
+            select trials_melanoma.trial_id, trials_melanoma.location_id,
+            6371 * acos(cos(radians(cte_lat_long.latitude))
+                    * cos(radians(us.latitude)) 
+                    * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
+                    + sin(radians(cte_lat_long.latitude)) 
+                    * sin(radians(us.latitude))) AS distance
+            from cte_lat_long,trials_melanoma inner join us on trials_melanoma.postal_code = us.zipcode
+            )
+            select cte_no_location.trial_id, cte_no_location.distance, cte_location.location_id, trial.brief_title as trial_title, trial.phase, trial.ecog_values as ecog, trial.stages as stage, location.location_name
+            from cte_no_location inner join cte_location on cte_no_location.trial_id = cte_location.trial_id
+                and cte_no_location.distance = cte_location.distance
+            inner join trial on cte_no_location.trial_id = trial.trial_id
+            inner join location on cte_location.location_id = location.location_id
+            order by cte_no_location.distance");
 
     foreach($testResults as $record) {
-        if (stripos($record->disease_data, $searchSubTerm)) {
-            $record->search_result_score = $record->search_result_score+1;
-        }
-        if (in_array(strtolower($record->trial_status),$myArr)) {
-            $record->search_result_score = $record->search_result_score+1;
-        }
-        if (stripos($record->phase, $searchPhase)) {
-            $record->search_result_score = $record->search_result_score+1;
-        }
+
+        $record->trial_summary = "";
+        $record->trial_status = "Open";
+        $record->nci_id = "";
+        $record->nct_id = "";
+
+        $record->location_address_line_1 = "";
+        $record->location_address_line_2 = "";
+        $record->location_city = "";
+        $record->location_state = "";
+        $record->location_postal_code = "";
+        $record->location_country = "";
+
+        $record->disease_count = [];
+        $record->professional_data = [];
+        $record->collaborator_data = [];
+        $record->contact_data = [];
+        //$record->contact_data = [];
+        $record->disease_data = [];
+        $record->related_location_data = [];
+        $record->search_result_score = 4.0;
+        $record->search_result_string = "Matching-";
+
         $array[] =  $record;
-    }
+     }
+
     return $array;
-    /*
-    foreach($testResults as $record) {
-        $trialResults = SelectisTrial::find($record->trial_id);
-        //return $trialResults;
-        $locationResults = SelectisLocation::find($record->location_id);
-        //return $locationResults;
-        //$record = array($record);
-        $record->trial_title = $trialResults->brief_title;
-        $record->trial_status = $trialResults->current_trial_status;
-        //$record["location_data"] = array($locationResults);
-        $record->location_name = $locationResults->name;
-        $record->location_address_line_1 = $locationResults->address_line_1;
-        $record->location_address_line_2 = $locationResults->address_line_2;
-        $record->location_city = $locationResults->city;
-        $record->location_state = $locationResults->state;
-        $record->location_postal_code = $locationResults->postal_code;
-        $record->location_country = $locationResults->country;
-        $professionals = DB::connection('pgsql2')->select('select * from trial_professional, trial_professional_ref
-        where trial_professional.trial_professional_id = trial_professional_ref.trial_professional_id
-        and trial_professional_ref.trial_id = ?',array($record->trial_id));
-
-        $collaborators = DB::connection('pgsql2')->select('select * from collaborator, trial_collaborator_ref
-        where collaborator.collaborator_id = trial_collaborator_ref.collaborator_id
-        and trial_collaborator_ref.trial_id = ?',array($record->trial_id));
-
-        $contacts = DB::connection('pgsql2')->select('select * from contact, trial_contact_ref
-        where contact.contact_id = trial_contact_ref.contact_id
-        and trial_contact_ref.trial_id = ?',array($record->trial_id));
-
-        $conditions = DB::connection('pgsql2')->select('select * from trial_disease, trial_disease_ref
-        where trial_disease.trial_disease_id = trial_disease_ref.trial_disease_id
-        and trial_disease_ref.trial_id = ? limit 3',array($record->trial_id));
-
-        $record->professionals = $professionals;
-        $record->collaborators = $collaborators;
-        $record->contacts = $contacts;
-
-        $array[] =  $record;
-    }
-    */
-//return $array;
-/* this works
- $testResults = DB::table("us")
-     ->select("us.zipcode", DB::raw("6371 * acos(cos(radians(" . $fLatitude . "))
-     * cos(radians(us.latitude)) 
-     * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
-     + sin(radians(" .$fLatitude. ")) 
-     * sin(radians(us.latitude))) AS distance"))
-     ->where(DB::raw("6371 * acos(cos(radians(" . $fLatitude . "))
-     * cos(radians(us.latitude)) 
-     * cos(radians(us.longitude) - radians(" . $fLongitude . ")) 
-     + sin(radians(" .$fLatitude. ")) 
-     * sin(radians(us.latitude)))"), '<=', $fRadius)
-     ->paginate(20);
-
-     return $testResults;
-*/
-
-
-
-
-
-
     }
 
     /**
