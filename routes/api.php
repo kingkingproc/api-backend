@@ -44,11 +44,16 @@ Route::put('/patientprofile','App\Http\Controllers\PatientProfileController@upda
 Route::put('/patientprofilediagnosis','App\Http\Controllers\PatientProfileDiagnosisController@update');
 Route::put('/patientprofiledoctors','App\Http\Controllers\PatientProfileDoctersController@update');
 
-Route::get('/searchtrialresult','App\Http\Controllers\TrialController@index');
-Route::get('/trialresult','App\Http\Controllers\TestController@index');
+//production routes:
 Route::get('/specialistresult','App\Http\Controllers\SpecialistController@index');
+Route::get('/trialresult','App\Http\Controllers\TrialController@index');
 
-Route::get('/trialbuild','App\Http\Controllers\TestTrialLoadController@index');
+//new routes in work
+Route::get('/newtrialresult','App\Http\Controllers\NewTrialController@index');
+Route::get('/newspecialistresult','App\Http\Controllers\NewSpecialistController@index');
+
+//new route for education tab
+Route::get('/education','App\Http\Controllers\EducationController@index');
 
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');

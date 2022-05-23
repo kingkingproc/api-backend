@@ -50,7 +50,7 @@ class SpecialistController extends Controller
         + sin(radians(" .$fLatitude. ")) 
         * sin(radians(us.latitude))) AS distance"))
         ->orderBy('distance', 'asc')
-        ->limit(500)
+        ->limit(200)
         ->get();
 
         //return $testResults;
@@ -67,10 +67,12 @@ class SpecialistController extends Controller
             $location = DB::connection('pgsql2')->select('select * from location
             where location.location_id = ?',array($record->location_id));
 
+            /*
             $all_location = DB::connection('pgsql2')->select('select * from location
             where location.location_id in (select location_id
                 from provider_location_ref where provider_id = ?
                 and location_id <> ?)',array($record->provider_id,$record->location_id));
+            */
 
             $all_open_trials = DB::connection('pgsql2')->select ("select t.nci_id, t.nct_id, tpr.role, t.status_mapped from
             trial t
@@ -106,7 +108,8 @@ class SpecialistController extends Controller
             $record->location_country = $location[0]->country;
             $record->last_name = $provider[0]->last_name;
             $record->search_result_score = 0.00;
-            $record->all_location = $all_location;
+            //$record->all_location = $all_location;
+            $record->all_location = [];
             $record->all_trials = $all_open_trials;
 
             $trial_count_score = 0.00;
@@ -136,6 +139,7 @@ class SpecialistController extends Controller
             if ($record->trial_count_adj > 6) {
                 $trial_count_score = 5.00;
             }
+            /*
             if ($record->h_index_adj <= 2.00) {
                 $h_count_score = 1.00;
             }
@@ -153,6 +157,8 @@ class SpecialistController extends Controller
             }
 
             $record->search_result_score = ($trial_count_score + $h_count_score)/2;
+            */
+            $record->search_result_score = $trial_count_score;
             //$record->search_result_score = ''<img src="bar.png">'';
             $array[] =  $record;
         }

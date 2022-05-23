@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Helper\Helper;
+
+use Illuminate\Http\Request;
+use App\Models\Patient;
+use App\Models\PatientDiagnosis;
+use App\Models\LkupPatientDiagnosisCancerType;
+use App\Models\LkupPatientDiagnosisCancerSubType;
+use App\Models\address;
+
+use Illuminate\Support\Facades\DB;
+
+
+class EducationController extends Controller
+{
+    public function index()
+    {
+
+        $request = request();
+        $the_object = Helper::verifyJasonToken($request);
+        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
+        $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
+        $searchType = $cancerTypeRecord[0]['cancer_type_id'];
+        $searchPhase = $diagnosisRecord[0]->performance_score_id;
+        $searchEcog = $diagnosisRecord[0]->performance_score_id;
+        $searchStage = $diagnosisRecord[0]->stage_id;
+
+        //$array[] =  $searchType;
+        //$array[] =  $searchPhase;
+        //$array[] =  $searchEcog;
+        //$array[] =  $searchStage;
+
+        $searchType = 212;
+        //$searchStage = 3;
+
+        $featured = DB::connection('pgsql')->select('
+        SELECT label,href,author,created_at as date FROM public.content_featured
+        WHERE cancer_type_id is null and cancer_stage_id is null
+        union
+        SELECT label,href,author,created_at as date FROM public.content_featured
+        WHERE cancer_type_id = ' . $searchType . ' and cancer_stage_id is null
+        union
+        SELECT label,href,author,created_at as date FROM public.content_featured
+        WHERE cancer_type_id = ' . $searchType . ' and cancer_stage_id = ' . $searchStage . '
+        ');
+        $array =  $featured;
+
+        $folders = DB::connection('pgsql')->select('
+        SELECT * FROM public.content_folder
+        WHERE cancer_type_id is null and cancer_stage_id is null
+        union
+        SELECT * FROM public.content_folder
+        WHERE cancer_type_id = ' . $searchType . ' and cancer_stage_id is null
+        union
+        SELECT * FROM public.content_folder
+        WHERE cancer_type_id = ' . $searchType . ' and cancer_stage_id = ' . $searchStage . '
+        ORDER BY content_folder_id ASC
+        ');
+
+        foreach($folders as $indiv_folder) {
+            $indiv_folder->links = [];
+            $links_records = DB::connection('pgsql')->select('
+            SELECT * FROM public.content_links
+            WHERE content_folder_id = ' . $indiv_folder->content_folder_id . '
+            ORDER BY content_link_id ASC
+            ');           
+            $indiv_folder->links = $links_records;
+            $folderarray[] = $indiv_folder;
+            
+        }
+        //$array["Folders"] = $folderarray;
+        //$array[] = $folderarray;
+        return $array;
+
+    }
+}

@@ -5,6 +5,7 @@ namespace App\Helper;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Helper
 {
@@ -29,6 +30,5 @@ class Helper
                 return ["message"=>"Bad Token"];
             }
     }
-
 
 }
