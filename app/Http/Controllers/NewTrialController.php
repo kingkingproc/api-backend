@@ -158,6 +158,11 @@ class NewTrialController extends Controller
                 $record->search_result_string = $record->search_result_string . "-Phase";
             }
 
+            if ($record->phase != null) {
+                $record->phase = preg_replace("/[^0-9,]/", "", $record->phase );
+                $record->phase = "[" . $record->phase . "]";
+            }
+
             //stage matching
             if (stripos($record->stage, $searchStage)) {
                 $record->search_result_score = $record->search_result_score+1.0;
