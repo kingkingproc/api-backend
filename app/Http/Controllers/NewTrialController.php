@@ -36,7 +36,7 @@ class NewTrialController extends Controller
         $cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
         $searchSubTerm = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
 
-        if ($searchSubTerm == "Acral Lentiginous Melanoma") {
+        if ($searchSubTerm == "Acral Lentiginous Melanoma (ALM)") {
             $array_search_sub_disease = array('Acral Lentiginous Melanoma', 'ALM', 'Acral Melanoma');
             $array_search_sub_not_disease = array('Excluding Acral Lentiginous Melanoma');
         }
@@ -97,7 +97,7 @@ class NewTrialController extends Controller
                             group by cte_no_location.trial_id, cte_no_location.distance
                             )
                             select cte_distinct_location.trial_id, cte_distinct_location.distance, cte_distinct_location.location_id, 
-                            trials_melanoma_full.*, us.latitude, us.longitude
+                            trials_melanoma_full.*, us.latitude, us.longitude, 0 as favorite
                             from cte_distinct_location
                             inner join trials_melanoma_full on cte_distinct_location.trial_id = trials_melanoma_full.trial_id
                             and cte_distinct_location.location_id = trials_melanoma_full.location_id
@@ -110,12 +110,15 @@ class NewTrialController extends Controller
         //$testResults = $testResults->sortBy('trial_id');
 
         foreach($testResults as $record) {
- 
+            if (in_array($record->trial_id, $trialList)) {
+                continue;
+            }
+            array_push($trialList,$record->trial_id); 
             //$record->disease_count = [];
             $record->professional_data = json_decode($record->professional_data);
             $record->collaborator_data = json_decode($record->collaborator_data);
             $record->contact_data = json_decode($record->contact_data);
-            $record->phase = json_decode($record->phase);
+            //$record->phase = json_decode($record->phase);
             $record->primary_purpose = ucwords($record->primary_purpose);
 
             $record->search_result_score = 0.0;
@@ -146,9 +149,9 @@ class NewTrialController extends Controller
                 $record->search_result_string = $record->search_result_string . "-ExcluseSubtype";
             }
             //phase matching
-            if ($record->phase != null) {
-                $record->phase =  $record->phase->phase;
-            }
+           // if ($record->phase != null) {
+           //     $record->phase =  $record->phase;
+           // }
 
             if (stripos($record->phase, $searchPhase)) {
                 $record->search_result_score = $record->search_result_score+1.0;

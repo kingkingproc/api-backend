@@ -32,7 +32,7 @@ class NewSpecialistController extends Controller
             select latitude,longitude from us where zipcode = '" . $addressRecord['address_zip'] . "'
             )
             select specialists_melanoma_full.*, us.zipcode, specialists_melanoma_full.postal_code as location_postal_code,
-            us.latitude, us.longitude,
+            us.latitude, us.longitude, 0 as favorite,
             6371 * acos(cos(radians(cte_lat_long.latitude))
                     * cos(radians(us.latitude)) 
                     * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
