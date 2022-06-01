@@ -161,6 +161,8 @@ class NewTrialController extends Controller
             if ($record->phase != null) {
                 $record->phase = preg_replace("/[^0-9,]/", "", $record->phase );
                 $record->phase = "[" . $record->phase . "]";
+            } else {
+                $record->phase = "[0]";
             }
 
             //stage matching
