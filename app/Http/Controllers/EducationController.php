@@ -38,16 +38,17 @@ class EducationController extends Controller
         //$searchStage = 3;
 
         $featured = DB::connection('pgsql')->select('
-        SELECT label,href,author,created_at as date FROM public.content_featured
+        SELECT content_featured_id,label,href,author,created_at as date FROM public.content_featured
         WHERE cancer_type_id is null and cancer_stage_id is null
         union
-        SELECT label,href,author,created_at as date FROM public.content_featured
+        SELECT content_featured_id,label,href,author,created_at as date FROM public.content_featured
         WHERE cancer_type_id = ' . $searchType . ' and cancer_stage_id is null
         union
-        SELECT label,href,author,created_at as date FROM public.content_featured
+        SELECT content_featured_id,label,href,author,created_at as date FROM public.content_featured
         WHERE cancer_type_id = ' . $searchType . ' and cancer_stage_id = ' . $searchStage . '
+        ORDER BY content_featured_id ASC
         ');
-        $array =  $featured;
+        $array["FEATURED_ARTICLES"] =  $featured;
 
         $folders = DB::connection('pgsql')->select('
         SELECT * FROM public.content_folder
@@ -65,14 +66,15 @@ class EducationController extends Controller
             $indiv_folder->links = [];
             $links_records = DB::connection('pgsql')->select('
             SELECT * FROM public.content_links
-            WHERE content_folder_id = ' . $indiv_folder->content_folder_id . '
+            WHERE content_folder_id = ' . $indiv_folder->content_folder_id . ' and 
+            (cancer_stage_id = ' . $searchStage . ' OR cancer_stage_id is null)
             ORDER BY content_link_id ASC
             ');           
             $indiv_folder->links = $links_records;
             $folderarray[] = $indiv_folder;
             
         }
-        //$array["Folders"] = $folderarray;
+        $array["FOLDERS"] = $folderarray;
         //$array[] = $folderarray;
         return $array;
 

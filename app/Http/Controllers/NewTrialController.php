@@ -36,6 +36,14 @@ class NewTrialController extends Controller
         $cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
         $searchSubTerm = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
 
+        //Patient record for DOB to figure out age req.
+        $patientRecord[0]["DOB"] = $patientRecord[0]["dob_day"] . "-" . $patientRecord[0]["dob_month"] . "-" . $patientRecord[0]["dob_year"];
+        $today = date("Y-m-d");
+        $diff = date_diff(date_create($patientRecord[0]["DOB"]), date_create($today));
+        $patientRecord[0]["AGE"] = $diff->format('%y');
+        //return $patientRecord;
+
+
         if ($searchSubTerm == "Acral Lentiginous Melanoma (ALM)") {
             $array_search_sub_disease = array('Acral Lentiginous Melanoma', 'ALM', 'Acral Melanoma');
             $array_search_sub_not_disease = array('Excluding Acral Lentiginous Melanoma');
@@ -114,6 +122,13 @@ class NewTrialController extends Controller
                 continue;
             }
             array_push($trialList,$record->trial_id); 
+
+            if ($patientRecord[0]["AGE"] > $record->eligibility_maximum_age) {
+                continue;
+            }
+            if ($patientRecord[0]["AGE"] < $record->eligibility_minimum_age) {
+                continue;
+            }
             //$record->disease_count = [];
             $record->professional_data = json_decode($record->professional_data);
             $record->collaborator_data = json_decode($record->collaborator_data);
@@ -199,7 +214,11 @@ class NewTrialController extends Controller
                 }
             }
 
-
+            $record->additional_location_data = json_decode($record->additional_location_data, true);
+            
+            array_multisort(array_column($record->additional_location_data, 'distance'), SORT_ASC, $record->additional_location_data);
+            $record->additional_location_data = array_slice($record->additional_location_data, 0, 3);
+            
            $record->search_result_score = $record->search_result_score; //2;
             if ($record->search_result_score > 5) {
                 $record->search_result_score = 5;
