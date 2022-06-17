@@ -168,10 +168,10 @@ class NewTrialController extends Controller
            //     $record->phase =  $record->phase;
            // }
 
-            if (stripos($record->phase, $searchPhase)) {
-                $record->search_result_score = $record->search_result_score+1.0;
-                $record->search_result_string = $record->search_result_string . "-Phase";
-            }
+//            if (stripos($record->phase, $searchPhase)) {
+//                $record->search_result_score = $record->search_result_score+1.0;
+//                $record->search_result_string = $record->search_result_string . "-Phase";
+//            }
 
             if ($record->phase != null) {
                 $record->phase = preg_replace("/[^0-9,]/", "", $record->phase );

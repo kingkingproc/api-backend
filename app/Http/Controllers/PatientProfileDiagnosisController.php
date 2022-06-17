@@ -66,7 +66,7 @@ class PatientProfileDiagnosisController extends Controller
 
             $diagnosisRecord = patientdiagnosis::where('patient_id',$patientRecord[0]['patient_id'])->get();
 
-            if ($diagnosisRecord) {
+            if (count($diagnosisRecord)) {
                 $diagnosisRecord_id = $diagnosisRecord[0]['diagnosis_id'];
                 $diagnosis = patientdiagnosis::find($diagnosisRecord_id);
                 $diagnosis->update($diagnosis_array);
