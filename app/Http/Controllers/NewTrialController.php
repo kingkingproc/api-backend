@@ -113,6 +113,11 @@ class NewTrialController extends Controller
                             order by cte_distinct_location.distance"
                 );
         //return $testResults;
+        $favoriteResults = DB::connection('pgsql')->select("
+                select type_id from patient_favorites where type='trial'
+                and patient_id = " . $patientRecord[0]['patient_id'] . " and
+                sub = '" . $patientRecord[0]['sub'] . "'");
+
         $trialList = [];
 
         //$testResults = $testResults->sortBy('trial_id');
@@ -122,6 +127,12 @@ class NewTrialController extends Controller
                 continue;
             }
             array_push($trialList,$record->trial_id); 
+
+            foreach($favoriteResults as $favorite) {
+                if ($favorite == $record->trial_id) {
+                    $record->favorite = 1;
+                }
+            }
 
             if ($patientRecord[0]["AGE"] > $record->eligibility_maximum_age) {
                 continue;

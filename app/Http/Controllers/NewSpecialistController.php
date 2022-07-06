@@ -42,6 +42,12 @@ class NewSpecialistController extends Controller
 			order by distance asc
         ");
 
+
+        $favoriteResults = DB::connection('pgsql')->select("
+                select type_id from patient_favorites where type='specialist'
+                and patient_id = " . $patientRecord[0]['patient_id'] . " and
+                sub = '" . $patientRecord[0]['sub'] . "'");
+
         $providerList = [];
 
         foreach($testResults as $record) {
@@ -50,6 +56,11 @@ class NewSpecialistController extends Controller
             }
             array_push($providerList,$record->provider_id);
 
+            foreach($favoriteResults as $favorite) {
+                if ($favorite == $record->provider_id) {
+                    $record->favorite = 1;
+                }
+            }
             $record->all_location = json_decode($record->all_location);
             $record->all_trials = json_decode($record->all_trials);
             $record->specialties = json_decode($record->specialties);

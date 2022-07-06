@@ -55,6 +55,9 @@ Route::get('/newspecialistresult','App\Http\Controllers\NewSpecialistController@
 //new route for education tab
 Route::get('/education','App\Http\Controllers\EducationController@index');
 
+//new route for favorite icon
+Route::get('/userfavorites ','App\Http\Controllers\PatientFavoriteController@index');
+
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
 Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');
