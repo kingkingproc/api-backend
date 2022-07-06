@@ -142,7 +142,7 @@ class NewTrialController extends Controller
             $myArr = ["open", "active", "available", "recruiting", "enrolling by invitation"];
 
             //disease in title
-            if (stripos($record->trial_title, $searchTerm)) {
+            if (stripos(" " . $record->trial_title, $searchTerm)) {
                 $record->search_result_score = $record->search_result_score+1.0;
                 $record->search_result_string = $record->search_result_string . "-Title";
             }
@@ -154,12 +154,12 @@ class NewTrialController extends Controller
             }
 
             //cancer sub type in title or list
-            if (strpos_arr($record->trial_title, $array_search_sub_disease) || strpos_arr($record->disease_arr, $array_search_sub_disease)) {
+            if (strpos_arr(" " . $record->trial_title, $array_search_sub_disease) || strpos_arr($record->disease_arr, $array_search_sub_disease)) {
                 $record->search_result_score = $record->search_result_score+2;
                 $record->search_result_string = $record->search_result_string . "-Subtype";
             } 
 
-            if (strpos_arr($record->trial_title, $array_search_sub_not_disease) || strpos_arr($record->disease_arr, $array_search_sub_not_disease)) {
+            if (strpos_arr(" " . $record->trial_title, $array_search_sub_not_disease) || strpos_arr($record->disease_arr, $array_search_sub_not_disease)) {
                 $record->search_result_score = $record->search_result_score-3;
                 $record->search_result_string = $record->search_result_string . "-ExcluseSubtype";
             }

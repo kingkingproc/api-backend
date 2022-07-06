@@ -213,11 +213,12 @@ class TrialController extends Controller
             unset($record->primary_purpose);
             unset($record->stage);
             unset($record->trial_status);
-            unset($record->nci_id);
-            unset($record->nct_id);
+            //unset($record->nci_id);
+            //unset($record->nct_id);
             unset($record->eligibility_maximum_age);
             unset($record->eligibility_minimum_age);
             unset($record->study_type);
+            unset($record->additional_location_data);
             
             $array[] = $record;
         }

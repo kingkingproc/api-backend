@@ -92,7 +92,9 @@ class SurveyCompleteController extends Controller
             $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
             $patient_array['ethnicity_id']=$request['ethnicity'];
             $patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
-
+            $patient_array['termsAgreement'] = (isset($request['termsAgreement'])?$request['termsAgreement']:0);
+            $patient_array['shareInformation'] = (isset($request['shareInformation'])?$request['shareInformation']:0);
+            $patient_array['sendInformation'] = (isset($request['sendInformation'])?$request['sendInformation']:0);
             //put address request data into array
             $address_array['address_city']=$request['city'];
             $address_array['address_state']=$request['state'];

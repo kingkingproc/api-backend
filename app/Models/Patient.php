@@ -25,7 +25,10 @@ class Patient extends Model
         'sex',
         'ethnicity_id',
         'address_id',
-        'is_complete'
+        'is_complete',
+        'termsAgreement',
+        'shareInformation',
+        'sendInformation'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
