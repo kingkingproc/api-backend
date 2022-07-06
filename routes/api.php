@@ -52,6 +52,10 @@ Route::get('/trialresult','App\Http\Controllers\TrialController@index');
 Route::get('/newtrialresult','App\Http\Controllers\NewTrialController@index');
 Route::get('/newspecialistresult','App\Http\Controllers\NewSpecialistController@index');
 
+//payload routes in work
+Route::get('/payloadtrialresult','App\Http\Controllers\PayloadTrialController@index');
+Route::get('/payloadspecialistresult','App\Http\Controllers\PayloadSpecialistController@index');
+
 //new route for education tab
 Route::get('/education','App\Http\Controllers\EducationController@index');
 
