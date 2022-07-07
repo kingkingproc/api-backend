@@ -31,7 +31,8 @@ class PatientFavoriteController extends Controller
 
         $testResults = DB::connection('pgsql')->delete("delete from patient_favorites where 
             patient_id = " . $array['patient_id'] . "
-            and sub = '" . $array['sub'] . "'");
+            and sub = '" . $array['sub'] . "'
+            and type = '" . $array['type'] . "'");
 
         foreach($request["favs"] as $favorite) {
             $favorites = explode("_", $favorite);
