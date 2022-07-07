@@ -129,7 +129,7 @@ class NewTrialController extends Controller
             array_push($trialList,$record->trial_id); 
 
             foreach($favoriteResults as $favorite) {
-                if ($favorite == $record->trial_id) {
+                if ($favorite->type_id == $record->trial_id) {
                     $record->favorite = 1;
                 }
             }

@@ -71,7 +71,7 @@ class PayloadSpecialistController extends Controller
             array_push($providerList,$record->provider_id);
 
             foreach($favoriteResults as $favorite) {
-                if ($favorite == $record->provider_id) {
+                if ($favorite->type_id == $record->provider_id) {
                     $record->favorite = 1;
                 }
             }

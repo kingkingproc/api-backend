@@ -78,7 +78,6 @@ class PayloadTrialController extends Controller
         $favoriteWhole = $request["payload"];
 
         foreach($favoriteWhole as $favorite) {
-            //return $favorite;
             $favorites = explode("_", $favorite);
             $trialArray[] =  $favorites[1];
             $locationArray[] =  $favorites[2];
@@ -119,7 +118,7 @@ class PayloadTrialController extends Controller
                             inner join trials_melanoma_full on cte_distinct_location.trial_id = trials_melanoma_full.trial_id
                             and cte_distinct_location.location_id = trials_melanoma_full.location_id
                             inner join us on trials_melanoma_full.postal_code = us.zipcode
-                            where trials_melanoma_full.provider_id IN('".implode("','",$trialArray)."')
+                            where trials_melanoma_full.trial_id IN('".implode("','",$trialArray)."')
                             and trials_melanoma_full.location_id  IN('".implode("','",$locationArray)."')
                             order by cte_distinct_location.distance"
                 );
@@ -128,6 +127,8 @@ class PayloadTrialController extends Controller
                 select type_id from patient_favorites where type='trial'
                 and patient_id = " . $patientRecord[0]['patient_id'] . " and
                 sub = '" . $patientRecord[0]['sub'] . "'");
+
+        
 
         $trialList = [];
 
@@ -140,7 +141,7 @@ class PayloadTrialController extends Controller
             array_push($trialList,$record->trial_id); 
 
             foreach($favoriteResults as $favorite) {
-                if ($favorite == $record->trial_id) {
+                if ($favorite->type_id == $record->trial_id) {
                     $record->favorite = 1;
                 }
             }
