@@ -62,6 +62,10 @@ Route::get('/education','App\Http\Controllers\EducationController@index');
 //new route for favorite icon
 Route::put('/userfavorites ','App\Http\Controllers\PatientFavoriteController@index');
 
+//new routes for navigation guide
+Route::put('/navigationguide','App\Http\Controllers\PatientNavigationguideController@update');
+Route::get('/navigationguide','App\Http\Controllers\PatientNavigationguideController@index');
+
 Route::resource('patientfull','App\Http\Controllers\PatientFullController');
 Route::resource('patientdiagnosis','App\Http\Controllers\PatientDiagnosisController');
 Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');

@@ -85,36 +85,43 @@ class PayloadSpecialistController extends Controller
 
             $record->search_result_score = 0.00;
             
-
-            
             $trial_count_score = 0.00;
 
             if ($record->trial_count_adj == 0) {
                 $trial_count_score = 1.00;
             }
-            if ($record->trial_count_adj == 1) {
+            if ($record->trial_count_adj > 0 && $record->trial_count_adj < 0.75) {
                 $trial_count_score = 2.00;
             }
-            if ($record->trial_count_adj == 2) {
+            if ($record->trial_count_adj >= 0.75 && $record->trial_count_adj < 1.5) {
                 $trial_count_score = 3.00;
             }
-            if ($record->trial_count_adj == 3) {
-                $trial_count_score = 3.00;
-            }
-            if ($record->trial_count_adj == 4) {
+            if ($record->trial_count_adj >= 1.5 && $record->trial_count_adj < 10) {
                 $trial_count_score = 4.00;
             }
-            if ($record->trial_count_adj == 5) {
-                $trial_count_score = 4.00;
-            }
-            if ($record->trial_count_adj == 6) {
-                $trial_count_score = 4.00;
-            }
-            if ($record->trial_count_adj > 6) {
+            if ($record->trial_count_adj >= 10) {
                 $trial_count_score = 5.00;
             }
 
-            $record->search_result_score = $trial_count_score;
+
+            $h_count_score = 0.00;
+
+            if ($record->h_index_adj <= 2) {
+                $h_count_score = 1.00;
+            }
+            if ($record->h_index_adj > 2 && $record->h_index_adj <= 6) {
+                $h_count_score = 2.00;
+            }
+            if ($record->h_index_adj > 6 && $record->h_index_adj <= 20) {
+                $h_count_score = 3.00;
+            }
+            if ($record->h_index_adj > 20 && $record->h_index_adj <= 63) {
+                $h_count_score = 4.00;
+            }
+            if ($record->h_index_adj > 63) {
+                $h_count_score = 5.00;
+            }
+            $record->search_result_score = ($trial_count_score + $h_count_score) / 2;
             $array[] =  $record;
         }
 
