@@ -144,6 +144,9 @@ class NewTrialController extends Controller
             $record->professional_data = json_decode($record->professional_data);
             $record->collaborator_data = json_decode($record->collaborator_data);
             $record->contact_data = json_decode($record->contact_data);
+
+            $record->eligibility_biomarker = json_decode($record->eligibility_biomarker);
+            $record->eligibility_comorbidities = json_decode($record->eligibility_comorbidities);
             //$record->phase = json_decode($record->phase);
             $record->primary_purpose = ucwords($record->primary_purpose);
 
