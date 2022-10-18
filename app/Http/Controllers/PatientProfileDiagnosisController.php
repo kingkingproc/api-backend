@@ -62,6 +62,7 @@ class PatientProfileDiagnosisController extends Controller
             $diagnosis_array['cancer_sub_type_id']=$request['cancer_sub_type']['key'];
             $diagnosis_array['is_brain_tumor']=$request['is_brain_tumor'];
             $diagnosis_array['is_metastatic']=$request['is_metastatic'];
+            $diagnosis_array['is_treatment_started']=$request['is_treatment_started'];
             $diagnosis_array['patient_id']=$patientRecord[0]['patient_id'];
 
             $diagnosisRecord = patientdiagnosis::where('patient_id',$patientRecord[0]['patient_id'])->get();

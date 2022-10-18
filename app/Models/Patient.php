@@ -28,7 +28,9 @@ class Patient extends Model
         'is_complete',
         'termsAgreement',
         'shareInformation',
-        'sendInformation'
+        'sendInformation',
+        'education_level',
+        'is_medicaid_patient'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

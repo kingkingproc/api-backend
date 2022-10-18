@@ -87,7 +87,7 @@ Route::resource('lkuppatientdiagnosistumorsite','App\Http\Controllers\DropDowns\
 Route::resource('lkuppatientdiagnosistumorsize','App\Http\Controllers\DropDowns\LkupPatientDiagnosisTumorSizeController');
 Route::resource('lkuppatientdiagnosisbiomarker','App\Http\Controllers\DropDowns\LkupPatientDiagnosisBiomarkerController');
 Route::resource('lkuppatientdiagnosissubtype','App\Http\Controllers\DropDowns\LkupPatientDiagnosisSubTypeController');
-
+Route::resource('lkuppatienteducationlevel','App\Http\Controllers\DropDowns\LkupPatientEducationLevelsController');
 
 // search routes for auto complete fields
 Route::get('/lkuppatientdiagnosisadditional/search/{label}',['App\Http\Controllers\DropDowns\LkupPatientDiagnosisAdditionalController', 'search']);

@@ -47,6 +47,8 @@ class PatientProfileController extends Controller
             // put patient request data into array
             $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
             $patient_array['ethnicity_id']=$request['ethnicity'];
+            $patient_array['education_level']=$request['education_level'];
+            $patient_array['is_medicaid_patient']=$request['is_medicaid_patient'];
             //$patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
 
             //put address request data into array
