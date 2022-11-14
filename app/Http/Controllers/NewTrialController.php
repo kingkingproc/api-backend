@@ -116,7 +116,7 @@ class NewTrialController extends Controller
                             inner join trials_" . $string_tableName . "_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_full.trial_id
                             and cte_distinct_location.location_id = trials_" . $string_tableName . "_full.location_id
                             inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
-                            order by cte_distinct_location.distance"
+                            order by cte_distinct_location.distance limit 200"
                 );
         //return $testResults;
         $favoriteResults = DB::connection('pgsql')->select("
