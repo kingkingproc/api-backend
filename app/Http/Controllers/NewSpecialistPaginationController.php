@@ -14,7 +14,7 @@ use App\Models\address;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class NewSpecialistController extends Controller
+class NewSpecialistPaginationController extends Controller
 {
     public function index() {
         $request = request();
@@ -115,7 +115,13 @@ class NewSpecialistController extends Controller
             $array[] =  $record;
         }
 
-        return $array;
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $results = $array;
+        $items = array_slice($array, ($page - 1) * $perPage, $perPage);
+        $posts = new LengthAwarePaginator($items, count($results), $perPage, $page);
+        return $posts;
+        //return $array;
     }
 
 }

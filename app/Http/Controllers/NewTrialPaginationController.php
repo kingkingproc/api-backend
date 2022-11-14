@@ -13,6 +13,7 @@ use App\Models\address;
 
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 function strpos_arr($haystack, $needle) {
     if(!is_array($needle)) $needle = array($needle);
@@ -22,7 +23,7 @@ function strpos_arr($haystack, $needle) {
     return false;
 }
 
-class NewTrialController extends Controller
+class NewTrialPaginationController extends Controller
 {
     public function index()
     {
@@ -63,7 +64,7 @@ class NewTrialController extends Controller
         }
         if ($searchSubTerm == "Mucosal Melanoma") {
             $array_search_sub_disease = array('Mucosal Melanoma');
-            $array_search_sub_not_disease = array('Mucosal Melanoma');
+            $array_search_sub_not_disease = array('Excluding Mucosal Melanoma');
         }
         if ($searchSubTerm == "Ocular Melanoma") {
             $array_search_sub_disease = array('Ocular Melanoma', 'Eye Melanoma', 'Uveal Melanoma', 'Intraocular Melanoma', 'Choroidal Melanoma', 'Iris Melanoma');
@@ -248,6 +249,13 @@ class NewTrialController extends Controller
 
             $array[] = $record;
         }
-        return $array;
+        
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $results = $array;
+        $items = array_slice($array, ($page - 1) * $perPage, $perPage);
+        $posts = new LengthAwarePaginator($items, count($results), $perPage, $page);
+        return $posts;
+        //return $array;
     }
 }

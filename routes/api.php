@@ -52,6 +52,10 @@ Route::get('/trialresult','App\Http\Controllers\TrialController@index');
 Route::get('/newtrialresult','App\Http\Controllers\NewTrialController@index');
 Route::get('/newspecialistresult','App\Http\Controllers\NewSpecialistController@index');
 
+//new routes with pagination
+Route::get('/newtrialresultpagination','App\Http\Controllers\NewTrialPaginationController@index');
+Route::get('/newspecialistresultpagination','App\Http\Controllers\NewSpecialistPaginationController@index');
+
 //payload routes in work
 Route::put('/payloadtrialresult','App\Http\Controllers\PayloadTrialController@index');
 Route::put('/payloadspecialistresult','App\Http\Controllers\PayloadSpecialistController@index');
