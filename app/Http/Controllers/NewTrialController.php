@@ -195,20 +195,29 @@ class NewTrialController extends Controller
             }
 
             //stage matching
-            if (!empty($record->stage) && !empty($searchStage)) {
-                if (stripos($record->stage, chr($searchStage))) {
+        if (!is_null($record->stage)) {
+            try {
+                if (str_contains($record->stage, $searchStage)) {
                     $record->search_result_score = $record->search_result_score+1.0;
                     $record->search_result_string = $record->search_result_string . "-Stage";
                 }
+            } catch (\Exception $e) {
+                
             }
+        }
+                
+
             //ecog matching
-            if (!empty($record->ecog) && !empty($searchEcog)) {
-                if (stripos($record->ecog, chr($searchEcog))) {
+        if (!is_null($record->ecog)) {
+            try {
+                if (str_contains($record->ecog, $searchEcog)) {
                     $record->search_result_score = $record->search_result_score+1.0;
                     $record->search_result_string = $record->search_result_string . "-Ecog";
                 }
+            } catch (\Exception $e) {
+                
             }
-
+        }
             //disease count
             if ($record->disease_count > 5) {
                 $record->search_result_score = $record->search_result_score-1.0;
