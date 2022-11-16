@@ -135,7 +135,11 @@ class SurveyCompleteController extends Controller
             $diagnosis_array['patient_id']=$patient['patient_id'];
             $diagnosis_array['cancer_type_id']=$request['diagnosis'];
             $diagnosis_array['stage_id']=$request['stage'];
-            $diagnosis_array['cancer_sub_type_id']=$request['diagnosis_sub']['key'];
+            try {
+                $diagnosis_array['cancer_sub_type_id']=$request['diagnosis_sub']['key'];
+            } catch (Exception $e) {
+                $diagnosis_array['cancer_sub_type_id']= NULL;    
+            }
             $diagnosis_array['performance_score_id']=$request['score'];
 
             // get the diagnosis record for the patient
