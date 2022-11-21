@@ -40,15 +40,22 @@ class NewTrialController extends Controller
         
 
         $searchTerm = $cancerTypeRecord[0]['cancer_type_label'];
-        $cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
-        $searchSubTerm = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
 
+        if (!is_null($diagnosisRecord[0]['cancer_sub_type_id'])) {
+            $cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
+            $searchSubTerm = $cancerSubTypeRecord[0]['cancer_sub_type_label'];
+        } else {
+            $searchSubTerm = ""; 
+        }
         //Patient record for DOB to figure out age req.
-        $patientRecord[0]["DOB"] = $patientRecord[0]["dob_day"] . "-" . $patientRecord[0]["dob_month"] . "-" . $patientRecord[0]["dob_year"];
-        $today = date("Y-m-d");
-        $diff = date_diff(date_create($patientRecord[0]["DOB"]), date_create($today));
-        $patientRecord[0]["AGE"] = $diff->format('%y');
-        //return $patientRecord;
+        if (!is_null($patientRecord[0]["dob_day"])) {
+            $patientRecord[0]["DOB"] = $patientRecord[0]["dob_day"] . "-" . $patientRecord[0]["dob_month"] . "-" . $patientRecord[0]["dob_year"];
+            $today = date("Y-m-d");
+            $diff = date_diff(date_create($patientRecord[0]["DOB"]), date_create($today));
+            $patientRecord[0]["AGE"] = $diff->format('%y');
+        } else {
+            $patientRecord[0]["AGE"] = "50";
+        }
 
         $array_search_sub_disease = array('Holder Value');
         $array_search_sub_not_disease = array('Holder Value');
@@ -195,29 +202,30 @@ class NewTrialController extends Controller
             }
 
             //stage matching
-        if (!is_null($record->stage)) {
-            try {
-                if (str_contains($record->stage, $searchStage)) {
-                    $record->search_result_score = $record->search_result_score+1.0;
-                    $record->search_result_string = $record->search_result_string . "-Stage";
+            if (!is_null($record->stage)) {
+                try {
+                    if (str_contains($record->stage, $searchStage)) {
+                        $record->search_result_score = $record->search_result_score+1.0;
+                        $record->search_result_string = $record->search_result_string . "-Stage";
+                    }
+                } catch (\Exception $e) {
+                    
                 }
-            } catch (\Exception $e) {
-                
             }
-        }
                 
 
             //ecog matching
-        if (!is_null($record->ecog)) {
-            try {
-                if (str_contains($record->ecog, $searchEcog)) {
-                    $record->search_result_score = $record->search_result_score+1.0;
-                    $record->search_result_string = $record->search_result_string . "-Ecog";
+            if (!is_null($record->ecog)) {
+                try {
+                    if (str_contains($record->ecog, $searchEcog)) {
+                        $record->search_result_score = $record->search_result_score+1.0;
+                        $record->search_result_string = $record->search_result_string . "-Ecog";
+                    }
+                } catch (\Exception $e) {
+                    
                 }
-            } catch (\Exception $e) {
-                
             }
-        }
+            
             //disease count
             if ($record->disease_count > 5) {
                 $record->search_result_score = $record->search_result_score-1.0;
