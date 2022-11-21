@@ -27,19 +27,21 @@ class EducationController extends Controller
         $searchType = 212;
         $searchStage = 1;
         
-        $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
-        $searchType = $cancerTypeRecord[0]['cancer_type_id'];
-        $searchPhase = $diagnosisRecord[0]->performance_score_id;
-        $searchEcog = $diagnosisRecord[0]->performance_score_id;
-        $searchStage = $diagnosisRecord[0]->stage_id;
-
-        //$array[] =  $searchType;
-        //$array[] =  $searchPhase;
-        //$array[] =  $searchEcog;
-        //$array[] =  $searchStage;
-
-        $searchType = 212;
-        //$searchStage = 3;
+        try {
+            $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
+            $searchType = $cancerTypeRecord[0]['cancer_type_id'];
+            $searchPhase = $diagnosisRecord[0]->performance_score_id;
+            $searchEcog = $diagnosisRecord[0]->performance_score_id;
+            $searchStage = $diagnosisRecord[0]->stage_id;
+        } catch (\Exception $e) {
+                        
+        }
+        if (is_null($searchStage)) {
+            $searchStage = 1;
+        } 
+        if (is_null($searchType)) {
+            $searchStage = 212;
+        } 
 
         $featured = DB::connection('pgsql')->select('
         SELECT content_featured_id,label,href,author,created_at as date FROM public.content_featured
