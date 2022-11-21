@@ -23,6 +23,10 @@ class EducationController extends Controller
         $the_object = Helper::verifyJasonToken($request);
         $patientRecord = patient::where('sub',$the_object->sub)->get();
         $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
+        //set for default values
+        $searchType = 212;
+        $searchStage = 1;
+        
         $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
         $searchType = $cancerTypeRecord[0]['cancer_type_id'];
         $searchPhase = $diagnosisRecord[0]->performance_score_id;
