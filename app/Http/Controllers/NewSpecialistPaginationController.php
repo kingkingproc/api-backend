@@ -29,6 +29,16 @@ class NewSpecialistPaginationController extends Controller
             $string_tableName = "nsclc";
         } 
 
+        //set filters for pagination
+        $filter_match = $request['filter_match'];
+        $filter_distance = $request['filter_distance'];
+        $filter_sort = $request['filter_sort'];
+        $filter_sort_direction = $request['filter_sort_direction'];
+        $filter_size = $request['filter_size'];
+        if ($filter_distance == 0) {
+            $filter_distance = 100000;
+        }
+
         $addressRecord = address::find($patientRecord[0]['address_id']);
 
         $testResults = DB::connection('pgsql2')->select("
@@ -43,7 +53,11 @@ class NewSpecialistPaginationController extends Controller
                     + sin(radians(cte_lat_long.latitude)) 
                     * sin(radians(us.latitude))) AS distance
             from cte_lat_long,specialists_" . $string_tableName . "_full inner join us on specialists_" . $string_tableName . "_full.postal_code = us.zipcode
-			order by distance asc
+			where 6371 * acos(cos(radians(cte_lat_long.latitude))
+            * cos(radians(us.latitude)) 
+            * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
+            + sin(radians(cte_lat_long.latitude)) 
+            * sin(radians(us.latitude))) <= " . $filter_distance . " order by distance asc
         ");
 
 
@@ -112,16 +126,38 @@ class NewSpecialistPaginationController extends Controller
                 $h_count_score = 5.00;
             }
             $record->search_result_score = ($trial_count_score + $h_count_score) / 2;
+
+            $record->pubmed_link = "https://pubmed.ncbi.nlm.nih.gov/?term=%28" . $record->last_name . "%5BAuthor+-+Last%5D%29+AND+%28" . $string_tableName . "%5BMeSH+Major+Topic%5D%29&sort=";
+            
             $array[] =  $record;
         }
 
+        //filter the array according to the request variables
+        if ($filter_distance <> 0) {
+            $array = array_filter($array, function ($item) use ($filter_distance) {
+                return $item->distance <= $filter_distance;
+            });
+        }
+
+        if ($filter_match <> 0) {
+            $array = array_filter($array, function ($item) use ($filter_match) {
+                return $item->search_result_score >= $filter_match;
+            });
+        }
+
+        if ($filter_sort_direction == "desc") {
+            $array = collect($array)->sortBy($filter_sort)->reverse()->toArray();
+        } else {
+            $array = collect($array)->sortBy($filter_sort)->toArray();
+        }
+
+        // paginate the filtered array and return
         $page = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 10;
+        $perPage = $filter_size;
         $results = $array;
         $items = array_slice($array, ($page - 1) * $perPage, $perPage);
         $posts = new LengthAwarePaginator($items, count($results), $perPage, $page);
         return $posts;
-        //return $array;
-    }
+     }
 
 }

@@ -39,6 +39,7 @@ Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeControll
 
 
 Route::put('/surveycomplete','App\Http\Controllers\SurveyCompleteController@update');
+Route::put('/oncoc4surveycomplete','App\Http\Controllers\OncoC4SurveyCompleteController@update');
 
 Route::put('/patientprofile','App\Http\Controllers\PatientProfileController@update');
 Route::put('/patientprofilediagnosis','App\Http\Controllers\PatientProfileDiagnosisController@update');

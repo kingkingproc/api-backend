@@ -39,6 +39,36 @@ class NewTrialPaginationController extends Controller
             $string_tableName = "nsclc";
         }       
         
+        //set filters for pagination
+        $filter_match = $request['filter_match'];
+        $filter_distance = $request['filter_distance'];
+        $filter_type = $request['filter_type'];
+        $filter_phase = $request['filter_phase'];
+        $filter_status = $request['filter_status'];
+        //Recruiting = Open
+        if ($filter_status == "Recruiting") {
+            $filter_status = "Open";
+        }
+        $filter_sort = $request['filter_sort'];
+        $filter_sort_direction = $request['filter_sort_direction'];
+        $filter_size = $request['filter_size'];
+        if ($filter_distance == 0) {
+            $filter_distance = 100000;
+        }
+        $string_where_clause = " Where 1=1 ";
+
+        if ($filter_status <> "All") {
+            $string_where_clause = $string_where_clause." and trials_" . $string_tableName . "_full.trial_status like '%" . $filter_status . "%'";
+        }
+
+        if ($filter_type <> "All") {
+            $string_where_clause = $string_where_clause." and trials_" . $string_tableName . "_full.study_type like '%" . $filter_type . "%'";
+        }
+
+
+        if ($filter_phase <> 0) {
+            $string_where_clause = $string_where_clause." and trials_" . $string_tableName . "_full.phase like '%" . $filter_phase . "%'";
+        }           
 
         $searchTerm = $cancerTypeRecord[0]['cancer_type_label'];
         $cancerSubTypeRecord = lkuppatientdiagnosiscancersubtype::where('cancer_sub_type_id',$diagnosisRecord[0]['cancer_sub_type_id'])->get();
@@ -97,6 +127,11 @@ class NewTrialPaginationController extends Controller
                                     + sin(radians(cte_lat_long.latitude)) 
                                     * sin(radians(us.latitude)))) AS distance
                             from cte_lat_long,trials_" . $string_tableName . "_full inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
+                            where 6371 * acos(cos(radians(cte_lat_long.latitude))
+                            * cos(radians(us.latitude)) 
+                            * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
+                            + sin(radians(cte_lat_long.latitude)) 
+                            * sin(radians(us.latitude)))  <= " . $filter_distance . "
                             group by trials_" . $string_tableName . "_full.trial_id
                             ),
                             cte_location as (
@@ -107,6 +142,11 @@ class NewTrialPaginationController extends Controller
                                     + sin(radians(cte_lat_long.latitude)) 
                                     * sin(radians(us.latitude))) AS distance
                             from cte_lat_long,trials_" . $string_tableName . "_full inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
+                            where 6371 * acos(cos(radians(cte_lat_long.latitude))
+                            * cos(radians(us.latitude)) 
+                            * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
+                            + sin(radians(cte_lat_long.latitude)) 
+                            * sin(radians(us.latitude)))  <= " . $filter_distance . "
                             ),
                             cte_distinct_location as (
                             select cte_no_location.trial_id, cte_no_location.distance, min(cte_location.location_id) as location_id
@@ -120,7 +160,8 @@ class NewTrialPaginationController extends Controller
                             inner join trials_" . $string_tableName . "_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_full.trial_id
                             and cte_distinct_location.location_id = trials_" . $string_tableName . "_full.location_id
                             inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
-                            order by cte_distinct_location.distance limit 200"
+                            " . $string_where_clause . "
+                            order by cte_distinct_location.distance"
                 );
         //return $testResults;
         $favoriteResults = DB::connection('pgsql')->select("
@@ -129,7 +170,7 @@ class NewTrialPaginationController extends Controller
                 sub = '" . $patientRecord[0]['sub'] . "'");
 
         $trialList = [];
-
+        $array = [];
         //$testResults = $testResults->sortBy('trial_id');
 
         foreach($testResults as $record) {
@@ -170,12 +211,15 @@ class NewTrialPaginationController extends Controller
                 $record->search_result_score = $record->search_result_score+1.0;
                 $record->search_result_string = $record->search_result_string . "-Title";
             }
-
+            $record->search_result_score = $record->search_result_score+1.0;
+            $record->search_result_string = $record->search_result_string . "-Title";
             //disease in list
             if (stripos($record->disease_arr, $searchTerm)) {
                 $record->search_result_score = $record->search_result_score+1.0;
                 $record->search_result_string = $record->search_result_string . "-List";
             }
+            $record->search_result_score = $record->search_result_score+1.0;
+            $record->search_result_string = $record->search_result_string . "-List";
 
             //cancer sub type in title or list
             if (strpos_arr(" " . $record->trial_title, $array_search_sub_disease) || strpos_arr($record->disease_arr, $array_search_sub_disease)) {
@@ -197,14 +241,14 @@ class NewTrialPaginationController extends Controller
 
             //stage matching
             if (!empty($record->stage) && !empty($searchStage)) {
-                if (stripos($record->stage, chr($searchStage))) {
+                if (stripos($record->stage, strval($searchStage))) {
                     $record->search_result_score = $record->search_result_score+1.0;
                     $record->search_result_string = $record->search_result_string . "-Stage";
                 }
             }
             //ecog matching
             if (!empty($record->ecog) && !empty($searchEcog)) {
-                if (stripos($record->ecog, chr($searchEcog))) {
+                if (stripos($record->ecog, strval($searchEcog))) {
                     $record->search_result_score = $record->search_result_score+1.0;
                     $record->search_result_string = $record->search_result_string . "-Ecog";
                 }
@@ -249,13 +293,55 @@ class NewTrialPaginationController extends Controller
 
             $array[] = $record;
         }
+
+        if (empty($array)) {
+            return $array;
+        }
         
+                //filter the array according to the request variables
+                if ($filter_distance <> 0) {
+                    $array = array_filter($array, function ($item) use ($filter_distance) {
+                        return $item->distance <= $filter_distance;
+                    });
+                }
+        
+                if ($filter_match <> 0) {
+                    $array = array_filter($array, function ($item) use ($filter_match) {
+                        return $item->search_result_score >= $filter_match;
+                    });
+                }
+
+                if ($filter_status <> "All") {
+                    $array = array_filter($array, function ($item) use ($filter_status) {
+                        return $item->trial_status === $filter_status;
+                    });
+                }
+
+                if ($filter_type <> "All") {
+                    $array = array_filter($array, function ($item) use ($filter_type) {
+                        return $item->study_type === $filter_type;
+                    });
+                }
+
+
+                if ($filter_phase <> 0) {
+                    $array = array_filter($array, function ($item) use ($filter_phase) {
+                        return (stripos($item->phase, strval($filter_phase)) !== false);
+                    });
+                }             
+
+                if ($filter_sort_direction == "desc") {
+                    $array = collect($array)->sortBy($filter_sort)->reverse()->toArray();
+                } else {
+                    $array = collect($array)->sortBy($filter_sort)->toArray();
+                }
+
+        // paginate the filtered array and return
         $page = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = 10;
+        $perPage = $filter_size;
         $results = $array;
         $items = array_slice($array, ($page - 1) * $perPage, $perPage);
         $posts = new LengthAwarePaginator($items, count($results), $perPage, $page);
         return $posts;
-        //return $array;
     }
 }

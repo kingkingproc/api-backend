@@ -105,23 +105,23 @@ class PayloadTrialController extends Controller
                             select latitude,longitude from us where zipcode = '" . $addressRecord['address_zip'] . "'
                             )
                             , cte_no_location as (
-                            select trials_melanoma_full.trial_id, MIN(
+                            select trials_" . $string_tableName . "_full.trial_id, MIN(
                             6371 * acos(cos(radians(cte_lat_long.latitude))
                                     * cos(radians(us.latitude)) 
                                     * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
                                     + sin(radians(cte_lat_long.latitude)) 
                                     * sin(radians(us.latitude)))) AS distance
-                            from cte_lat_long,trials_melanoma_full inner join us on trials_melanoma_full.postal_code = us.zipcode
-                            group by trials_melanoma_full.trial_id
+                            from cte_lat_long,trials_" . $string_tableName . "_full inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
+                            group by trials_" . $string_tableName . "_full.trial_id
                             ),
                             cte_location as (
-                            select trials_melanoma_full.trial_id, trials_melanoma_full.location_id,
+                            select trials_" . $string_tableName . "_full.trial_id, trials_" . $string_tableName . "_full.location_id,
                             6371 * acos(cos(radians(cte_lat_long.latitude))
                                     * cos(radians(us.latitude)) 
                                     * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
                                     + sin(radians(cte_lat_long.latitude)) 
                                     * sin(radians(us.latitude))) AS distance
-                            from cte_lat_long,trials_melanoma_full inner join us on trials_melanoma_full.postal_code = us.zipcode
+                            from cte_lat_long,trials_" . $string_tableName . "_full inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
                             ),
                             cte_distinct_location as (
                             select cte_no_location.trial_id, cte_no_location.distance, min(cte_location.location_id) as location_id
@@ -130,13 +130,13 @@ class PayloadTrialController extends Controller
                             group by cte_no_location.trial_id, cte_no_location.distance
                             )
                             select cte_distinct_location.trial_id, cte_distinct_location.distance, cte_distinct_location.location_id, 
-                            trials_melanoma_full.*, us.latitude, us.longitude, 0 as favorite
+                            trials_" . $string_tableName . "_full.*, us.latitude, us.longitude, 0 as favorite
                             from cte_distinct_location
-                            inner join trials_melanoma_full on cte_distinct_location.trial_id = trials_melanoma_full.trial_id
-                            and cte_distinct_location.location_id = trials_melanoma_full.location_id
-                            inner join us on trials_melanoma_full.postal_code = us.zipcode
-                            where trials_melanoma_full.trial_id IN('".implode("','",$trialArray)."')
-                            and trials_melanoma_full.location_id  IN('".implode("','",$locationArray)."')
+                            inner join trials_" . $string_tableName . "_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_full.trial_id
+                            and cte_distinct_location.location_id = trials_" . $string_tableName . "_full.location_id
+                            inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
+                            where trials_" . $string_tableName . "_full.trial_id IN('".implode("','",$trialArray)."')
+                            and trials_" . $string_tableName . "_full.location_id  IN('".implode("','",$locationArray)."')
                             order by cte_distinct_location.distance"
                 );
         //return $testResults;

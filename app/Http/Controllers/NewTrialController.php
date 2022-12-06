@@ -176,12 +176,16 @@ class NewTrialController extends Controller
                 $record->search_result_score = $record->search_result_score+1.0;
                 $record->search_result_string = $record->search_result_string . "-Title";
             }
-
+            $record->search_result_score = $record->search_result_score+1.0;
+            $record->search_result_string = $record->search_result_string . "-Title";
             //disease in list
             if (stripos($record->disease_arr, $searchTerm)) {
                 $record->search_result_score = $record->search_result_score+1.0;
                 $record->search_result_string = $record->search_result_string . "-List";
             }
+            $record->search_result_score = $record->search_result_score+1.0;
+            $record->search_result_string = $record->search_result_string . "-List";
+
 
             //cancer sub type in title or list
             if (strpos_arr(" " . $record->trial_title, $array_search_sub_disease) || strpos_arr($record->disease_arr, $array_search_sub_disease)) {

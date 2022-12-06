@@ -112,6 +112,8 @@ class NewSpecialistController extends Controller
                 $h_count_score = 5.00;
             }
             $record->search_result_score = ($trial_count_score + $h_count_score) / 2;
+
+            $record->pubmed_link = "https://pubmed.ncbi.nlm.nih.gov/?term=%28" . $record->last_name . "%5BAuthor+-+Last%5D%29+AND+%28" . $string_tableName . "%5BMeSH+Major+Topic%5D%29&sort=";
             $array[] =  $record;
         }
 
