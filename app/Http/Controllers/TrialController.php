@@ -42,6 +42,9 @@ class TrialController extends Controller
             $string_tableName = "nsclc";
         }
 
+        $array_search_sub_disease = array('Holder Value');
+        $array_search_sub_not_disease = array('Holder Value');
+        
         if ($searchSubTerm == "Acral Lentiginous Melanoma") {
             $array_search_sub_disease = array('Acral Lentiginous Melanoma', 'ALM', 'Acral Melanoma');
             $array_search_sub_not_disease = array('Excluding Acral Lentiginous Melanoma');
@@ -153,24 +156,34 @@ class TrialController extends Controller
             }
             //phase matching
             if ($record->phase != null) {
-                $record->phase =  $record->phase->phase;
-            }
-
-            if (stripos($record->phase, $searchPhase)) {
-                $record->search_result_score = $record->search_result_score+1.0;
-                $record->search_result_string = $record->search_result_string . "-Phase";
+                //$record->phase = preg_replace("/[^0-9,]/", "", $record->phase );
+                //$record->phase = "[" . $record->phase . "]";
+            } else {
+                //$record->phase = "[0]";
             }
 
             //stage matching
-            if (stripos($record->stage, $searchStage)) {
-                $record->search_result_score = $record->search_result_score+1.0;
-                $record->search_result_string = $record->search_result_string . "-Stage";
+            if (!is_null($record->stage)) {
+                try {
+                    if (str_contains($record->stage, $searchStage)) {
+                        $record->search_result_score = $record->search_result_score+1.0;
+                        $record->search_result_string = $record->search_result_string . "-Stage";
+                    }
+                } catch (\Exception $e) {
+                    
+                }
             }
 
             //ecog matching
-            if (stripos($record->ecog, $searchEcog)) {
-                $record->search_result_score = $record->search_result_score+1.0;
-                $record->search_result_string = $record->search_result_string . "-Ecog";
+            if (!is_null($record->ecog)) {
+                try {
+                    if (str_contains($record->ecog, $searchEcog)) {
+                        $record->search_result_score = $record->search_result_score+1.0;
+                        $record->search_result_string = $record->search_result_string . "-Ecog";
+                    }
+                } catch (\Exception $e) {
+                    
+                }
             }
 
             //disease count

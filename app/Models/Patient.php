@@ -30,7 +30,8 @@ class Patient extends Model
         'shareInformation',
         'sendInformation',
         'education_level',
-        'is_medicaid_patient'
+        'is_medicaid_patient',
+        'view_at'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

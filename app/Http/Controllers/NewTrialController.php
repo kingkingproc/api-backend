@@ -264,11 +264,14 @@ class NewTrialController extends Controller
             if ($record->search_result_score < 0) {
                 $record->search_result_score = 0;
             }
-
-
+            $record->bln_new = false;
+            $record->bln_badge_location = false;
+            $record->bln_badge_travel = false;
+            $record->bln_badge_lodging = false;
 
             $array[] = $record;
         }
+        patient::where('sub',$the_object->sub)->update(['view_at'=>date('Y-m-d H:i:s')]);
         return $array;
     }
 }

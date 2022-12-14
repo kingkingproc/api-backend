@@ -20,144 +20,45 @@ use Illuminate\Support\Facades\DB;
 
 class OncoC4SurveyCompleteController extends Controller
 {
-    public function verifyJasonToken(Request $request) {
-        $the_publicKey = config('services.aws.COGNITO_PUBLIC_KEY');
-        $token = $request->bearerToken();
-        $tokenParts = explode(".", $token);  
-        $tokenHeader = base64_decode($tokenParts[0]);
-        $tokenPayload = base64_decode($tokenParts[1]);
-        $jwtHeader = json_decode($tokenHeader);
-        $jwtPayload = json_decode($tokenPayload);
 
-        $the_object = JWT::decode($token,$the_publicKey,['RS256', 'RS256']);
-
-       
-        if ( ($the_object->iss=="https://cognito-idp.".config('services.aws.COGNITO_REGION').".amazonaws.com/".config('services.aws.COGNITO_USER_POOL_ID'))
-            && ($the_object->aud==config('services.aws.COGNITO_CLIENT_ID'))
-            && ($the_object->token_use==config('services.aws.COGNITO_TOKEN'))
-            ) {
-                return $the_object;
-            } else {
-                return ["message"=>"Bad Token"];
-            }
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-
-
-
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request)
     {
         $request = request();
 
-        $testResults = DB::connection('pgsql2')->select(" 
-        with cte_lat_long as (
-            select latitude,longitude from us where zipcode = '" . $request['zip_code'] . "'
-            )
-            , cte_no_location as (
-            select trials_nsclc_full.trial_id, MIN(
-            6371 * acos(cos(radians(cte_lat_long.latitude))
-                    * cos(radians(us.latitude)) 
-                    * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
-                    + sin(radians(cte_lat_long.latitude)) 
-                    * sin(radians(us.latitude)))) AS distance
-            from cte_lat_long,trials_nsclc_full inner join us on trials_nsclc_full.postal_code = us.zipcode
-            group by trials_nsclc_full.trial_id
-            ),
-            cte_location as (
-            select trials_nsclc_full.trial_id, trials_nsclc_full.location_id,
-            6371 * acos(cos(radians(cte_lat_long.latitude))
-                    * cos(radians(us.latitude)) 
-                    * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
-                    + sin(radians(cte_lat_long.latitude)) 
-                    * sin(radians(us.latitude))) AS distance
-            from cte_lat_long,trials_nsclc_full inner join us on trials_nsclc_full.postal_code = us.zipcode
-            ),
-            cte_distinct_location as (
-            select cte_no_location.trial_id, cte_no_location.distance, min(cte_location.location_id) as location_id
-            from cte_no_location inner join cte_location on cte_no_location.trial_id = cte_location.trial_id
-                and cte_no_location.distance = cte_location.distance
-            group by cte_no_location.trial_id, cte_no_location.distance
-            )
-            select cte_distinct_location.trial_id, cte_distinct_location.distance, cte_distinct_location.location_id, 
-            trials_nsclc_full.*, us.latitude, us.longitude, 0 as favorite
-            from cte_distinct_location
-            inner join trials_nsclc_full on cte_distinct_location.trial_id = trials_nsclc_full.trial_id
-            and cte_distinct_location.location_id = trials_nsclc_full.location_id
-            inner join us on trials_nsclc_full.postal_code = us.zipcode
-            where trials_nsclc_full.trial_id = '1807853588'
-            order by cte_distinct_location.distance limit 1"
-            );
-
-        //return $testResults;
-
-        foreach($testResults as $record) {
-            $record->professional_data = json_decode($record->professional_data);
-            $record->collaborator_data = json_decode($record->collaborator_data);
-            $record->contact_data = json_decode($record->contact_data);
-        
-            $record->additional_location_data = json_decode($record->additional_location_data, true);
-            
-            array_multisort(array_column($record->additional_location_data, 'distance'), SORT_ASC, $record->additional_location_data);
-            $record->additional_location_data = array_slice($record->additional_location_data, 0, 6);
-            $array[] = $record;
-        }
-        return $array;
-
-
-
-
-        $the_object = self::verifyJasonToken($request);
             // Get the patient record for the sub
-            $patientRecord = patient::where('sub',$the_object->sub)->get();
+            //$patientRecord = patient::where('sub',$request['sub'])->get();
+            //if sub not found, try email
+            
+            $patientRecord = patient::where('email',$request['email'])->get();
+            if (!empty($request['sub'])) {
+                if (count($patientRecord)) {
+                    $patient_array['user_type']=1; 
+                    $patient_array['sub']=(isset($request['sub'])?$request['sub']:"");
+                    $patient_array['patient_id']=$patientRecord[0]['patient_id'];
+                    $patient = patient::find($patientRecord[0]['patient_id']);
+                    $patient->update($patient_array);
 
+                    return json_encode(array('status' => 'success'));
+                }
+            }
+            
             // put patient request data into array
-            // $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
             
             $patient_array['user_type']=(isset($request['user_type'])?$request['user_type']:10);
             $patient_array['name_first']=(isset($request['name_first'])?$request['name_first']:"");
             $patient_array['name_last']=(isset($request['name_last'])?$request['name_last']:"");
+            $patient_array['sub']=(isset($request['sub'])?$request['sub']:"");
+            $patient_array['email']=(isset($request['email'])?$request['email']:"");
             $patient_array['name_middle']=(isset($request['name_middle'])?$request['name_middle']:"");
-            $patient_array['dob_month']=(isset($request['dob_month'])?$request['dob_month']:0);
-            $patient_array['dob_day']=(isset($request['dob_day'])?$request['dob_day']:0);
-            $patient_array['dob_year']=(isset($request['dob_year'])?$request['dob_year']:0);
+//            if ($request['bln_age']) {
+//                $patient_array['dob_month'] = date("m");
+//                $patient_array['dob_day'] = date("d");
+//                $patient_array['dob_year'] = date("Y") - 18;
+//            } else {
+//                $patient_array['dob_month'] = date("m");
+//                $patient_array['dob_day'] = date("d");
+//                $patient_array['dob_year'] = date("Y") - 17;
+//            }
             $patient_array['sex']=(isset($request['sex'])?$request['sex']:"");
             
             $patient_array['ethnicity_id']=(isset($request['ethnicity'])?$request['ethnicity']:0);
@@ -171,6 +72,25 @@ class OncoC4SurveyCompleteController extends Controller
             $address_array['address_city']=(isset($request['city'])?$request['city']:"");
             $address_array['address_state']=(isset($request['state'])?$request['state']:"");
             $address_array['address_zip']=(isset($request['zip_code'])?$request['zip_code']:"");
+            //put diagnosis request data into array
+            if ($request['bln_diagnosis']) {
+                $diagnosis_array['cancer_type_id'] = "213";
+                $diagnosis_array['is_metastatic'] = true;
+            } else {
+                $diagnosis_array['cancer_type_id'] = "213";
+                $diagnosis_array['is_metastatic'] = false; 
+            }
+
+            if ($request['bln_brain']) {
+                $diagnosis_array['is_brain_tumor'] = true;
+            } else {
+                $diagnosis_array['is_brain_tumor'] = false;
+            }
+
+            if ($request['bln_immunotherapy']) {
+                $treatment_array['treatment_id'] = 4;
+            } 
+
 
             // Check if there is a patient that exist for the sub
             if (count($patientRecord)) {
@@ -195,24 +115,14 @@ class OncoC4SurveyCompleteController extends Controller
                 $address = address::create($address_array);
 
                 //place the new address_id into the patient array
-                $patient_array['address_id']=$address[0]['address_id'];
+                $patient_array['address_id']=$address['address_id'];
 
                 //create the patient
                 $patient = patient::create($patient_array);
             }
-            
+           
             //put diagnosis request data into array
             $diagnosis_array['patient_id']=$patient['patient_id'];
-            $diagnosis_array['cancer_type_id']=$request['diagnosis'];
-            $diagnosis_array['stage_id']=$request['stage'];
-
-            if (is_array($request['diagnosis_sub'])) {
-                $diagnosis_array['cancer_sub_type_id']=$request['diagnosis_sub']['key'];
-            } else {
-                $diagnosis_array['cancer_sub_type_id']= NULL;
-            }
-
-            $diagnosis_array['performance_score_id']=$request['score'];
 
             // get the diagnosis record for the patient
             $diagnosisRecord = PatientDiagnosis::where('patient_id',$patient['patient_id'])->get();
@@ -229,28 +139,73 @@ class OncoC4SurveyCompleteController extends Controller
 
             $diagnosis_id = $diagnosis['diagnosis_id'];
 
-            $additionals_to_remove = PatientDiagnosisAdditional::where('diagnosis_id',$diagnosis_id)->get();
-            foreach ($additionals_to_remove as $to_remove) {
-                PatientDiagnosisAdditional::destroy($to_remove['id']);
+            $treatments_to_remove = PatientDiagnosisTreatment::where('diagnosis_id',$diagnosis_id)->get();
+            foreach ($treatments_to_remove as $to_remove) {
+                PatientDiagnosisTreatment::destroy($to_remove['id']);
             }
 
-            foreach ($request['comorbidities'] as $to_add) {
-                //PatientDiagnosisAdditional::destroy($to_remove['id']);
-                $additional_array['diagnosis_id']=$diagnosis_id;
-                $additional_array['additional_id']=$to_add;
-                PatientDiagnosisAdditional::create($additional_array);
+            if (!empty($treatment_array['treatment_id'])) {
+                $treatment_array['diagnosis_id']=$diagnosis_id;
+                PatientDiagnosisTreatment::create($treatment_array);
             }
-            return $request;
+
+        if (($request['bln_age']) && ($request['bln_diagnosis']) && (!$request['bln_brain']) && (!$request['bln_mutation']) && ($request['bln_immunotherapy']) && ($request['bln_progressed'])) {
+            $testResults = DB::connection('pgsql2')->select(" 
+            with cte_lat_long as (
+                select latitude,longitude from us where zipcode = '" . $request['zip_code'] . "'
+                )
+                , cte_no_location as (
+                select trials_nsclc_full.trial_id, MIN(
+                6371 * acos(cos(radians(cte_lat_long.latitude))
+                        * cos(radians(us.latitude)) 
+                        * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
+                        + sin(radians(cte_lat_long.latitude)) 
+                        * sin(radians(us.latitude)))) AS distance
+                from cte_lat_long,trials_nsclc_full inner join us on trials_nsclc_full.postal_code = us.zipcode
+                group by trials_nsclc_full.trial_id
+                ),
+                cte_location as (
+                select trials_nsclc_full.trial_id, trials_nsclc_full.location_id,
+                6371 * acos(cos(radians(cte_lat_long.latitude))
+                        * cos(radians(us.latitude)) 
+                        * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
+                        + sin(radians(cte_lat_long.latitude)) 
+                        * sin(radians(us.latitude))) AS distance
+                from cte_lat_long,trials_nsclc_full inner join us on trials_nsclc_full.postal_code = us.zipcode
+                ),
+                cte_distinct_location as (
+                select cte_no_location.trial_id, cte_no_location.distance, min(cte_location.location_id) as location_id
+                from cte_no_location inner join cte_location on cte_no_location.trial_id = cte_location.trial_id
+                    and cte_no_location.distance = cte_location.distance
+                group by cte_no_location.trial_id, cte_no_location.distance
+                )
+                select cte_distinct_location.trial_id, cte_distinct_location.distance, cte_distinct_location.location_id, 
+                trials_nsclc_full.*, us.latitude, us.longitude, 0 as favorite
+                from cte_distinct_location
+                inner join trials_nsclc_full on cte_distinct_location.trial_id = trials_nsclc_full.trial_id
+                and cte_distinct_location.location_id = trials_nsclc_full.location_id
+                inner join us on trials_nsclc_full.postal_code = us.zipcode
+                where trials_nsclc_full.trial_id = '-1333382593'
+                order by cte_distinct_location.distance limit 1"
+                );
+    
+            //return $testResults;
+    
+            foreach($testResults as $record) {
+                $record->professional_data = json_decode($record->professional_data);
+                $record->collaborator_data = json_decode($record->collaborator_data);
+                $record->contact_data = json_decode($record->contact_data);
+            
+                $record->additional_location_data = json_decode($record->additional_location_data, true);
+                
+                array_multisort(array_column($record->additional_location_data, 'distance'), SORT_ASC, $record->additional_location_data);
+                $record->additional_location_data = array_slice($record->additional_location_data, 0, 6);
+                $array[] = $record;
+            }
+            return $array;
+        } else {
+            return [];
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

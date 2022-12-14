@@ -49,6 +49,10 @@ class PatientProfileController extends Controller
             $patient_array['ethnicity_id']=$request['ethnicity'];
             $patient_array['education_level']=$request['education_level'];
             $patient_array['is_medicaid_patient']=$request['is_medicaid_patient'];
+
+            $patient_array['email']=(isset($request['email'])?$request['email']:"");
+            $patient_array['sendInformation']=(isset($request['sendInformation'])?$request['sendInformation']:'false');
+
             //$patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
 
             //put address request data into array

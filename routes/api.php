@@ -37,6 +37,7 @@ Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController')
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
 Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeController');
 
+Route::post('/newsletter','App\Http\Controllers\NewsletterController@store');
 
 Route::put('/surveycomplete','App\Http\Controllers\SurveyCompleteController@update');
 Route::put('/oncoc4surveycomplete','App\Http\Controllers\OncoC4SurveyCompleteController@update');

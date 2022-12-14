@@ -93,6 +93,7 @@ class SurveyCompleteController extends Controller
             $patient_array['ethnicity_id']=$request['ethnicity'];
             $patient_array['education_level']=$request['education_level'];
             $patient_array['is_medicaid_patient']=$request['is_medicaid_patient'];
+            $patient_array['email'] = (isset($request['email'])?$request['email']:"");
             $patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
             $patient_array['termsAgreement'] = (isset($request['termsAgreement'])?$request['termsAgreement']:0);
             $patient_array['shareInformation'] = (isset($request['shareInformation'])?$request['shareInformation']:0);
