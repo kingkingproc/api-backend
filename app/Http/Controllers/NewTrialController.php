@@ -27,6 +27,23 @@ class NewTrialController extends Controller
     public function index()
     {
 
+         
+        
+        $currentMonth = date('F');
+        $currentYear = date('Y');
+        $currentDate = date('m/d/Y', strtotime("Today"));
+        $compareDate = date('m/d/Y', strtotime("first Tuesday of $currentMonth $currentYear"));
+
+        if ($currentDate > $compareDate) {
+            $new_flag_date = $compareDate;
+        } else {
+            $formerMonth = date("F", strtotime("-1 months"));
+            $formerYear = date("Y", strtotime("-1 months"));
+            $compareDate = date('m/d/Y', strtotime("first Tuesday of $formerMonth $formerYear"));
+            $new_flag_date = $compareDate;
+        }
+        
+
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
         $patientRecord = patient::where('sub',$the_object->sub)->get();
@@ -268,7 +285,7 @@ class NewTrialController extends Controller
             if ($record->search_result_score < 0) {
                 $record->search_result_score = 0;
             }
-            if ($record->current_trial_status_date > $patientRecord[0]["view_at"]) {
+            if ($record->current_trial_status_date > $new_flag_date) {
                 $record->bln_new = true;
             } else {
                 $record->bln_new = false;
