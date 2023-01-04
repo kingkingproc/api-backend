@@ -38,6 +38,10 @@ class NewTrialController extends Controller
             $string_tableName = "nsclc";
         }       
         
+        
+        //$prescreenTrialList = Helper::getPrescreenTrialList();
+        $prescreenTrialList = Helper::patientPrescreenStatus($patientRecord[0]['patient_id']);
+        //return $prescreenTrialList;
 
         $searchTerm = $cancerTypeRecord[0]['cancer_type_label'];
 
@@ -126,7 +130,7 @@ class NewTrialController extends Controller
                             inner join trials_" . $string_tableName . "_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_full.trial_id
                             and cte_distinct_location.location_id = trials_" . $string_tableName . "_full.location_id
                             inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
-                            order by cte_distinct_location.distance limit 200"
+                            order by cte_distinct_location.distance"
                 );
         //return $testResults;
         $favoriteResults = DB::connection('pgsql')->select("
@@ -264,14 +268,36 @@ class NewTrialController extends Controller
             if ($record->search_result_score < 0) {
                 $record->search_result_score = 0;
             }
-            $record->bln_new = false;
+            if ($record->current_trial_status_date > $patientRecord[0]["view_at"]) {
+                $record->bln_new = true;
+            } else {
+                $record->bln_new = false;
+            }
             $record->bln_badge_location = false;
             $record->bln_badge_travel = false;
             $record->bln_badge_lodging = false;
+            $record->bln_sponsored = false;
+            $record->prescreen_flag = null;
+
+            foreach($prescreenTrialList as $prescreen) {
+                
+                if ($record->trial_id == $prescreen->trial_id) {
+                    $record->bln_sponsored = true;
+                    $record->bln_badge_travel = true;
+                    $record->prescreen_flag = $prescreen->patient_eligible;
+
+                } 
+            }
+
 
             $array[] = $record;
         }
         patient::where('sub',$the_object->sub)->update(['view_at'=>date('Y-m-d H:i:s')]);
-        return $array;
+
+
+        array_multisort(array_column($array, 'bln_sponsored'), SORT_DESC,
+                array_column($array, 'distance'),      SORT_ASC,
+                $array);
+        return array_slice($array, 0, 500);
     }
 }

@@ -24,9 +24,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     
 });
 */
+// new pre screen routes for testing
+Route::post('/prescreen','App\Http\Controllers\PrescreenController@index');
+Route::put('/prescreen','App\Http\Controllers\PrescreenController@update');
 
 Route::resource('address','App\Http\Controllers\AddressController');
 Route::resource('patient','App\Http\Controllers\PatientController');
+Route::resource('newsletter','App\Http\Controllers\NewsletterController');
 
 Route::resource('patientcontact','App\Http\Controllers\PatientContactController');
 Route::resource('patientcontactdata','App\Http\Controllers\PatientContactDataController');
@@ -37,7 +41,6 @@ Route::resource('sureveystepone','App\Http\Controllers\SurveyStepOneController')
 Route::resource('sureveysteptwo','App\Http\Controllers\SurveyStepTwoController');
 Route::resource('sureveystepthree','App\Http\Controllers\SurveyStepThreeController');
 
-Route::post('/newsletter','App\Http\Controllers\NewsletterController@store');
 
 Route::put('/surveycomplete','App\Http\Controllers\SurveyCompleteController@update');
 Route::put('/oncoc4surveycomplete','App\Http\Controllers\OncoC4SurveyCompleteController@update');

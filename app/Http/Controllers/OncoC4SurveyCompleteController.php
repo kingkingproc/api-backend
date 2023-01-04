@@ -50,17 +50,7 @@ class OncoC4SurveyCompleteController extends Controller
             $patient_array['sub']=(isset($request['sub'])?$request['sub']:"");
             $patient_array['email']=(isset($request['email'])?$request['email']:"");
             $patient_array['name_middle']=(isset($request['name_middle'])?$request['name_middle']:"");
-//            if ($request['bln_age']) {
-//                $patient_array['dob_month'] = date("m");
-//                $patient_array['dob_day'] = date("d");
-//                $patient_array['dob_year'] = date("Y") - 18;
-//            } else {
-//                $patient_array['dob_month'] = date("m");
-//                $patient_array['dob_day'] = date("d");
-//                $patient_array['dob_year'] = date("Y") - 17;
-//            }
             $patient_array['sex']=(isset($request['sex'])?$request['sex']:"");
-            
             $patient_array['ethnicity_id']=(isset($request['ethnicity'])?$request['ethnicity']:0);
             $patient_array['education_level']=(isset($request['education_level'])?$request['education_level']:0);
             $patient_array['is_medicaid_patient']=(isset($request['is_medicaid_patient'])?$request['is_medicaid_patient']:0);

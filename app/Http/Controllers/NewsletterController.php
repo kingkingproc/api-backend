@@ -14,10 +14,11 @@ class NewsletterController extends Controller
     // get route 
     public function index()
     {
-        $request = request();
-        $newsletterRecord = newsletter::where('email', $request['email'])->get();
+        //$request = request();
+        //$newsletterRecord = newsletter::where('email', $request['email'])->get();
         
-        return $navigationRecord;
+        //return $navigationRecord;
+        return newsletter::all();
     }
 
 
@@ -25,8 +26,21 @@ class NewsletterController extends Controller
     public function store(Request $request)
     {
 
-        newsletter::create($request->all());
-        return json_encode(array('status' => 'success'));
+        $response = newsletter::create($request->all());
+        $response["status"] = "success";
+        //return json_encode(array('status' => 'success'));
+
+        //$response = json_encode(array('status' => 'success'));
+        unset($response->newsletter_id);
+        unset($response->name_first);
+        unset($response->name_last);
+        unset($response->email);
+        unset($response->bln_marketing);
+        unset($response->message);
+        unset($response->role);
+        unset($response->site);
+        unset($response->source);
+        return $response;
         
     }
 

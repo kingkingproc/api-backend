@@ -31,4 +31,26 @@ class Helper
             }
     }
 
+
+    public static function patientPrescreenStatus($patient_id) {
+        $testResults = DB::connection('pgsql')->select("
+        Select 
+        ptr.trial_id,
+        COALESCE((select ppr.patient_eligible from prescreen_patient_ref ppr where ptr.prescreen_id = ppr.prescreen_id and ppr.patient_id = '" . $patient_id . "'),'show_prescreen') as patient_eligible
+        from prescreen_trial_ref ptr
+        ");
+
+        return $testResults;
+    }
+
+    public static function getPrescreenTrialList() {
+        $testResults = DB::connection('pgsql')->select("
+            select distinct trial_id from prescreen_trial_ref
+        ");
+        foreach ($testResults as $trialId) {
+            $array[] = $trialId->trial_id;
+        }
+
+        return $array;
+    }
 }

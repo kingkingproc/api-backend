@@ -114,6 +114,9 @@ class PatientProfileDiagnosisController extends Controller
                 $tempCollection = patientdiagnosisbiomarker::create($tempArray);
             }
 
+            $deleted = DB::table('prescreen_response')->where('patient_id', '=', $patientRecord[0]['patient_id'])->delete();
+            $secondDeleted = DB::table('prescreen_patient_ref')->where('patient_id', '=', $patientRecord[0]['patient_id'])->delete();
+
             return $request;
     }
 
