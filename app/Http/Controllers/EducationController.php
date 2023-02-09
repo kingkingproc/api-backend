@@ -27,21 +27,19 @@ class EducationController extends Controller
         $searchType = 212;
         $searchStage = 1;
         
-        try {
-            $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
-            $searchType = $cancerTypeRecord[0]['cancer_type_id'];
-            $searchPhase = $diagnosisRecord[0]->performance_score_id;
-            $searchEcog = $diagnosisRecord[0]->performance_score_id;
-            $searchStage = $diagnosisRecord[0]->stage_id;
-        } catch (\Exception $e) {
-                        
-        }
+        $searchType =  $diagnosisRecord[0]['cancer_type_id'];
+        $searchPhase = $diagnosisRecord[0]->performance_score_id;
+        $searchEcog = $diagnosisRecord[0]->performance_score_id;
+        $searchStage = $diagnosisRecord[0]->stage_id;
+
         if (is_null($searchStage)) {
             $searchStage = 1;
         } 
         if (is_null($searchType)) {
-            $searchStage = 212;
+            $searchType = 212;
         } 
+
+
 
         $featured = DB::connection('pgsql')->select('
         SELECT content_featured_id,label,href,author,created_at as date FROM public.content_featured
@@ -73,7 +71,8 @@ class EducationController extends Controller
             $links_records = DB::connection('pgsql')->select('
             SELECT * FROM public.content_links
             WHERE content_folder_id = ' . $indiv_folder->content_folder_id . ' and 
-            (cancer_stage_id = ' . $searchStage . ' OR cancer_stage_id is null)
+            (cancer_stage_id = ' . $searchStage . ' OR cancer_stage_id is null) and
+            (cancer_type_id = ' . $searchType . ' OR cancer_type_id is null)
             ORDER BY content_link_id ASC
             ');           
             $indiv_folder->links = $links_records;

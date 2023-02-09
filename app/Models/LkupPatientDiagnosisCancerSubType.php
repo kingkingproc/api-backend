@@ -13,7 +13,9 @@ class LkupPatientDiagnosisCancerSubType extends Model
 
     protected $fillable = [
         'cancer_sub_type_label',
-        'cancer_type_id'
+        'cancer_type_id',
+        'cancer_sub_type_synonyms',
+        'cancer_sub_type_antonyms'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

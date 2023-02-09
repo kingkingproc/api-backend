@@ -75,6 +75,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'schema' => 'public',
+            'sslrootcert' => 'https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem',
             'sslmode' => 'prefer',
         ],
 
@@ -90,6 +91,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'schema' => 'public',
+            'sslrootcert' => 'https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem',
             'sslmode' => 'prefer',
         ],
 

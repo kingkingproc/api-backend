@@ -50,23 +50,23 @@ class SpecialistController extends Controller
         $providerList = [];
 
         foreach($testResults as $record) {
-            if (in_array($record->provider_id, $providerList)) {
-                continue;
-            }
-            array_push($providerList,$record->provider_id);
+            //if (in_array($record->provider_id, $providerList)) {
+            //    continue;
+            //}
+            //array_push($providerList,$record->provider_id);
 
-            $record->all_location = json_decode($record->all_location);
-            $record->all_trials = json_decode($record->all_trials);
-            $record->specialties = json_decode($record->specialties);
+            //$record->all_location = json_decode($record->all_location);
+            //$record->all_trials = json_decode($record->all_trials);
+            //$record->specialties = json_decode($record->specialties);
 
             $record->coe_flag = var_export($record->coe_flag, true);
             if ($record->coe_flag === "true") {$record->coe_flag = "Yes";}
             if ($record->coe_flag === "false") {$record->coe_flag = "No";}
 
-            $record->search_result_score = 0.00;
+            //$record->search_result_score = 0.00;
             
-            $trial_count_score = 0.00;
-
+            //$trial_count_score = 0.00;
+/*
             if ($record->trial_count_adj == 0) {
                 $trial_count_score = 1.00;
             }
@@ -102,7 +102,7 @@ class SpecialistController extends Controller
                 $h_count_score = 5.00;
             }
             $record->search_result_score = ($trial_count_score + $h_count_score) / 2;
-
+*/
             unset($record->specialties);
             unset($record->all_trials);
             unset($record->all_location);

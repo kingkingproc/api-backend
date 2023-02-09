@@ -203,15 +203,7 @@ class PayloadTrialController extends Controller
                 $record->search_result_score = $record->search_result_score-3;
                 $record->search_result_string = $record->search_result_string . "-ExcluseSubtype";
             }
-            //phase matching
-           // if ($record->phase != null) {
-           //     $record->phase =  $record->phase;
-           // }
 
-//            if (stripos($record->phase, $searchPhase)) {
-//                $record->search_result_score = $record->search_result_score+1.0;
-//                $record->search_result_string = $record->search_result_string . "-Phase";
-//            }
 
             if ($record->phase != null) {
                 $record->phase = preg_replace("/[^0-9,]/", "", $record->phase );
@@ -280,7 +272,18 @@ class PayloadTrialController extends Controller
                 $record->search_result_score = 0;
             }
 
-
+            unset($record->ecog);
+            unset($record->stage);
+            unset($record->current_trial_status_date);
+            unset($record->study_first_posted);
+            unset($record->eligibility_maximum_age);
+            unset($record->eligibility_minimum_age);
+            unset($record->disease_count);
+            unset($record->disease_arr);
+            unset($record->drug_arr);
+            unset($record->collaborator_data);
+            unset($record->eligibility_biomarker);
+            unset($record->eligibility_comorbidities);
 
             $array[] = $record;
         }

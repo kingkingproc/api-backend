@@ -49,21 +49,29 @@ Route::put('/patientprofile','App\Http\Controllers\PatientProfileController@upda
 Route::put('/patientprofilediagnosis','App\Http\Controllers\PatientProfileDiagnosisController@update');
 Route::put('/patientprofiledoctors','App\Http\Controllers\PatientProfileDoctersController@update');
 
-//production routes:
+// Slim routes for performance
+Route::put('/trialdetail','App\Http\Controllers\TrialDetailController@index');
+Route::get('/triallist','App\Http\Controllers\TrialListController@index');
+Route::put('/specialistdetail','App\Http\Controllers\SpecialistDetailController@index');
+Route::get('/specialistlist','App\Http\Controllers\SpecialistListController@index');
+
+//map routes:
 Route::get('/specialistresult','App\Http\Controllers\SpecialistController@index');
 Route::get('/trialresult','App\Http\Controllers\TrialController@index');
 
+
 //new routes in work
-Route::get('/newtrialresult','App\Http\Controllers\NewTrialController@index');
-Route::get('/newspecialistresult','App\Http\Controllers\NewSpecialistController@index');
+//Route::get('/newtrialresult','App\Http\Controllers\NewTrialController@index');
+//Route::get('/newspecialistresult','App\Http\Controllers\NewSpecialistController@index');
 
 //new routes with pagination
-Route::get('/newtrialresultpagination','App\Http\Controllers\NewTrialPaginationController@index');
-Route::get('/newspecialistresultpagination','App\Http\Controllers\NewSpecialistPaginationController@index');
+//Route::get('/newtrialresultpagination','App\Http\Controllers\NewTrialPaginationController@index');
+//Route::get('/newspecialistresultpagination','App\Http\Controllers\NewSpecialistPaginationController@index');
 
 //payload routes in work
-Route::put('/payloadtrialresult','App\Http\Controllers\PayloadTrialController@index');
-Route::put('/payloadspecialistresult','App\Http\Controllers\PayloadSpecialistController@index');
+//Route::put('/payloadtrialresult','App\Http\Controllers\PayloadTrialController@index');
+//Route::put('/payloadspecialistresult','App\Http\Controllers\PayloadSpecialistController@index');
+
 
 //new route for education tab
 Route::get('/education','App\Http\Controllers\EducationController@index');
@@ -81,7 +89,7 @@ Route::resource('patientdoctor','App\Http\Controllers\PatientDoctorController');
 
 
 Route::put('usertrace','App\Http\Controllers\UserTraceController@store');
-
+Route::get('usercognito','App\Http\Controllers\UserCognitoController@index');
 
 // routes to lookup table, which have no creates or updates (for select form fields)
 Route::resource('lkuppatientethnicity','App\Http\Controllers\DropDowns\LkupPatientEthnicityController');

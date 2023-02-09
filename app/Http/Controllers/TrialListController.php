@@ -23,7 +23,7 @@ function strpos_arr($haystack, $needle) {
     return false;
 }
 
-class NewTrialPaginationController extends Controller
+class TrialListController extends Controller
 {
     public function index()
     {
@@ -33,7 +33,7 @@ class NewTrialPaginationController extends Controller
         $brainMetsResults = DB::connection('pgsql2')->select("
         select distinct trial_id from eligibility_comorbidities where location = 'brain' and comorbidity_type = 'metastasis' and inclusion_indicator is not null
         and inclusion_indicator <> is_present
-        and trial_id in (select trial_id from trials_melanoma_full)
+        and trial_id in (select trial_id from trials_melanoma_thin_full)
         ");
 
 
@@ -55,35 +55,33 @@ class NewTrialPaginationController extends Controller
         ");
         $cancerTypeRecord = lkuppatientdiagnosiscancertype::where('cancer_type_id',$diagnosisRecord[0]['cancer_type_id'])->get();
         if ($cancerTypeRecord[0]['cancer_type_label'] == "Melanoma") {
-            $string_tableName = "melanoma_thin";
-            $string_cancerType = 'melanoma';
+            $string_tableName = "melanoma";
         } else {
-            $string_tableName = "nsclc_thin";
-            $string_cancerType = 'nsclc';
+            $string_tableName = "nsclc";
         }       
-        //return $biomarkerRecord;
+
         $brainMetsResults = "";
-        //return $diagnosisRecord;
+
         if ($diagnosisRecord[0]['is_brain_tumor'] && $diagnosisRecord[0]['is_metastatic']) {
             $brainMetsResults = DB::connection('pgsql2')->select("
             select distinct trial_id from eligibility_comorbidities where location = 'brain' and comorbidity_type = 'metastasis' and inclusion_indicator is not null
             and inclusion_indicator = is_present
-            and trial_id in (select trial_id from trials_" . $string_tableName . "_full)
+            and trial_id in (select trial_id from trials_" . $string_tableName . "_thin_full)
             ");
         }
         if (!$diagnosisRecord[0]['is_brain_tumor'] && !$diagnosisRecord[0]['is_metastatic']) {
             $brainMetsResults = DB::connection('pgsql2')->select("
             select distinct trial_id from eligibility_comorbidities where location = 'brain' and comorbidity_type = 'metastasis' and inclusion_indicator is not null
             and inclusion_indicator <> is_present
-            and trial_id in (select trial_id from trials_" . $string_tableName . "_full)
+            and trial_id in (select trial_id from trials_" . $string_tableName . "_thin_full)
             ");
         }
         
 
         
         //$prescreenTrialList = Helper::getPrescreenTrialList();
-        $prescreenTrialList = Helper::patientPrescreenStatus($patientRecord[0]['patient_id'],$string_cancerType);
-        //return $prescreenTrialList;
+        $prescreenTrialList = Helper::patientPrescreenStatus($patientRecord[0]['patient_id'],$string_tableName);
+
 
         $searchTerm = $cancerTypeRecord[0]['cancer_type_label'];
 
@@ -125,23 +123,23 @@ class NewTrialPaginationController extends Controller
                             select latitude,longitude from us where zipcode = '" . $addressRecord['address_zip'] . "'
                             )
                             , cte_no_location as (
-                            select trials_" . $string_tableName . "_full.trial_id, MIN(
+                            select trials_" . $string_tableName . "_thin_full.trial_id, MIN(
                             6371 * acos(cos(radians(cte_lat_long.latitude))
                                     * cos(radians(us.latitude)) 
                                     * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
                                     + sin(radians(cte_lat_long.latitude)) 
                                     * sin(radians(us.latitude)))) AS distance
-                            from cte_lat_long,trials_" . $string_tableName . "_full inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
-                            group by trials_" . $string_tableName . "_full.trial_id
+                            from cte_lat_long,trials_" . $string_tableName . "_thin_full inner join us on trials_" . $string_tableName . "_thin_full.postal_code = us.zipcode
+                            group by trials_" . $string_tableName . "_thin_full.trial_id
                             ),
                             cte_location as (
-                            select trials_" . $string_tableName . "_full.trial_id, trials_" . $string_tableName . "_full.location_id,
+                            select trials_" . $string_tableName . "_thin_full.trial_id, trials_" . $string_tableName . "_thin_full.location_id,
                             6371 * acos(cos(radians(cte_lat_long.latitude))
                                     * cos(radians(us.latitude)) 
                                     * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
                                     + sin(radians(cte_lat_long.latitude)) 
                                     * sin(radians(us.latitude))) AS distance
-                            from cte_lat_long,trials_" . $string_tableName . "_full inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
+                            from cte_lat_long,trials_" . $string_tableName . "_thin_full inner join us on trials_" . $string_tableName . "_thin_full.postal_code = us.zipcode
                             ),
                             cte_distinct_location as (
                             select cte_no_location.trial_id, cte_no_location.distance, min(cte_location.location_id) as location_id
@@ -150,11 +148,11 @@ class NewTrialPaginationController extends Controller
                             group by cte_no_location.trial_id, cte_no_location.distance
                             )
                             select cte_distinct_location.trial_id, cte_distinct_location.distance, cte_distinct_location.location_id, 
-                            trials_" . $string_tableName . "_full.*, us.latitude, us.longitude, 0 as favorite
+                            trials_" . $string_tableName . "_thin_full.*, us.latitude, us.longitude, 0 as favorite
                             from cte_distinct_location
-                            inner join trials_" . $string_tableName . "_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_full.trial_id
-                            and cte_distinct_location.location_id = trials_" . $string_tableName . "_full.location_id
-                            inner join us on trials_" . $string_tableName . "_full.postal_code = us.zipcode
+                            inner join trials_" . $string_tableName . "_thin_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_thin_full.trial_id
+                            and cte_distinct_location.location_id = trials_" . $string_tableName . "_thin_full.location_id
+                            inner join us on trials_" . $string_tableName . "_thin_full.postal_code = us.zipcode
                             order by cte_distinct_location.distance"
                 );
 
@@ -167,10 +165,12 @@ class NewTrialPaginationController extends Controller
 
 
         foreach($testResults as $record) {
-            if (in_array($record->trial_id, $trialList)) {
-                continue;
+            if ($request->path() == 'api/triallist') {
+                if (in_array($record->trial_id, $trialList)) {
+                    continue;
+                }
+                array_push($trialList,$record->trial_id); 
             }
-            array_push($trialList,$record->trial_id); 
 
             foreach($favoriteResults as $favorite) {
                 if ($favorite->type_id == $record->trial_id) {
@@ -212,7 +212,6 @@ class NewTrialPaginationController extends Controller
             elseif ((strpos_arr(" " . $record->trial_title, $array_disease_non_hematologic) || strpos_arr($record->disease_arr, $array_disease_non_hematologic)) && !strpos_arr(" " . $record->trial_title, $array_disease_contain) && !strpos_arr($record->disease_arr, $array_disease_contain)) {
                 $record->search_result_score = $record->search_result_score+6;
                 $record->search_result_string = $record->search_result_string . "-Cat5";
-                return $record;
             }
             elseif ((strpos_arr(" " . $record->trial_title, $array_disease_non_hematologic) || strpos_arr($record->disease_arr, $array_disease_non_hematologic)) && !strpos_arr(" " . $record->trial_title, $array_disease_contain) && !strpos_arr($record->disease_arr, $array_disease_contain)) {
                 $record->search_result_score = $record->search_result_score+6;
@@ -342,13 +341,15 @@ class NewTrialPaginationController extends Controller
         patient::where('sub',$the_object->sub)->update(['view_at'=>date('Y-m-d H:i:s')]);
 
 
-        //array_multisort(array_column($array, 'bln_sponsored'), SORT_DESC,
-        //        array_column($array, 'distance'),      SORT_ASC,
-        //        $array);
+        if ($request->path() == 'api/triallist') {
+            array_multisort(array_column($array, 'search_result_score'), SORT_DESC,
+            array_column($array, 'distance'),      SORT_ASC,
+            $array);
 
-        array_multisort(array_column($array, 'search_result_score'), SORT_DESC,
-                array_column($array, 'distance'),      SORT_ASC,
-                $array);
-        return array_slice($array, 0, 500);
+            return array_slice($array, 0, 2000);
+        } else {
+            return $array;
+
+        }
     }
 }

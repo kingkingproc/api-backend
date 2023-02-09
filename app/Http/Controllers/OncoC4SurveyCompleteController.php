@@ -38,7 +38,7 @@ class OncoC4SurveyCompleteController extends Controller
                     $patient = patient::find($patientRecord[0]['patient_id']);
                     $patient->update($patient_array);
 
-                    return json_encode(array('status' => 'success'));
+                    //return json_encode([array('status' => 'success')]);
                 }
             }
             
@@ -81,7 +81,12 @@ class OncoC4SurveyCompleteController extends Controller
                 $treatment_array['treatment_id'] = 4;
             } 
 
-
+            if ($request['bln_marketing']) {
+                $patient_array['shareInformation'] = false;
+            } else {
+                $patient_array['shareInformation'] = true;
+            }
+            
             // Check if there is a patient that exist for the sub
             if (count($patientRecord)) {
                 //patient record exist, so update the patient
@@ -140,28 +145,28 @@ class OncoC4SurveyCompleteController extends Controller
             }
 
         if (($request['bln_age']) && ($request['bln_diagnosis']) && (!$request['bln_brain']) && (!$request['bln_mutation']) && ($request['bln_immunotherapy']) && ($request['bln_progressed'])) {
-            $testResults = DB::connection('pgsql2')->select(" 
+            $firstResults = DB::connection('pgsql2')->select(" 
             with cte_lat_long as (
                 select latitude,longitude from us where zipcode = '" . $request['zip_code'] . "'
                 )
                 , cte_no_location as (
-                select trials_nsclc_full.trial_id, MIN(
+                select trials_nsclc_thin_full.trial_id, MIN(
                 6371 * acos(cos(radians(cte_lat_long.latitude))
                         * cos(radians(us.latitude)) 
                         * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
                         + sin(radians(cte_lat_long.latitude)) 
                         * sin(radians(us.latitude)))) AS distance
-                from cte_lat_long,trials_nsclc_full inner join us on trials_nsclc_full.postal_code = us.zipcode
-                group by trials_nsclc_full.trial_id
+                from cte_lat_long,trials_nsclc_thin_full inner join us on trials_nsclc_thin_full.postal_code = us.zipcode
+                group by trials_nsclc_thin_full.trial_id
                 ),
                 cte_location as (
-                select trials_nsclc_full.trial_id, trials_nsclc_full.location_id,
+                select trials_nsclc_thin_full.trial_id, trials_nsclc_thin_full.location_id,
                 6371 * acos(cos(radians(cte_lat_long.latitude))
                         * cos(radians(us.latitude)) 
                         * cos(radians(us.longitude) - radians(cte_lat_long.longitude)) 
                         + sin(radians(cte_lat_long.latitude)) 
                         * sin(radians(us.latitude))) AS distance
-                from cte_lat_long,trials_nsclc_full inner join us on trials_nsclc_full.postal_code = us.zipcode
+                from cte_lat_long,trials_nsclc_thin_full inner join us on trials_nsclc_thin_full.postal_code = us.zipcode
                 ),
                 cte_distinct_location as (
                 select cte_no_location.trial_id, cte_no_location.distance, min(cte_location.location_id) as location_id
@@ -170,31 +175,68 @@ class OncoC4SurveyCompleteController extends Controller
                 group by cte_no_location.trial_id, cte_no_location.distance
                 )
                 select cte_distinct_location.trial_id, cte_distinct_location.distance, cte_distinct_location.location_id, 
-                trials_nsclc_full.*, us.latitude, us.longitude, 0 as favorite
+                trials_nsclc_thin_full.*, us.latitude, us.longitude, 0 as favorite
                 from cte_distinct_location
-                inner join trials_nsclc_full on cte_distinct_location.trial_id = trials_nsclc_full.trial_id
-                and cte_distinct_location.location_id = trials_nsclc_full.location_id
-                inner join us on trials_nsclc_full.postal_code = us.zipcode
-                where trials_nsclc_full.trial_id = '-1333382593'
+                inner join trials_nsclc_thin_full on cte_distinct_location.trial_id = trials_nsclc_thin_full.trial_id
+                and cte_distinct_location.location_id = trials_nsclc_thin_full.location_id
+                inner join us on trials_nsclc_thin_full.postal_code = us.zipcode
+                where trials_nsclc_thin_full.trial_id = '-934321243'
                 order by cte_distinct_location.distance limit 1"
                 );
     
-            //return $testResults;
-    
+            //return $firstResults;
+
+            $testResults = DB::connection('pgsql2')->select(" 
+            select * from trials_additional_data
+                where trials_additional_data.trial_id = ".$firstResults[0]->trial_id."
+                and trials_additional_data.location_id = ".$firstResults[0]->location_id."
+                "
+            );
+
+
+            $trialList = [];    
             foreach($testResults as $record) {
+                if (in_array($record->trial_id, $trialList)) {
+                    continue;
+                }
+                array_push($trialList,$record->trial_id); 
+    
+    
                 $record->professional_data = json_decode($record->professional_data);
-                $record->collaborator_data = json_decode($record->collaborator_data);
                 $record->contact_data = json_decode($record->contact_data);
-            
-                $record->additional_location_data = json_decode($record->additional_location_data, true);
+                $record->primary_purpose = ucwords($record->primary_purpose);
+    
+                $locationResults = DB::connection('pgsql2')->select(" 
+                    select location.* from
+                    location inner join trials_additional_locations on location.location_id = trials_additional_locations.additional_location_id
+                    where trials_additional_locations.base_trial_id = '". $record->trial_id ."'
+                    and trials_additional_locations.base_location_id = '". $record->location_id ."'
+                    ");
+    
+                if ($record->phase != null) {
+                    $record->phase = preg_replace("/[^0-9,]/", "", $record->phase );
+                    $record->phase = "[" . $record->phase . "]";
+                } else {
+                    $record->phase = "[0]";
+                }
+    
+    
+    
+                //$record->additional_location_data = json_decode($record->additional_location_data, true);
+                $record->additional_location_data = json_decode(json_encode($locationResults), true);
+                //array_multisort(array_column($record->additional_location_data, 'distance'), SORT_ASC, $record->additional_location_data);
+                //$record->additional_location_data = array_slice($record->additional_location_data, 0, 5);
                 
-                array_multisort(array_column($record->additional_location_data, 'distance'), SORT_ASC, $record->additional_location_data);
-                $record->additional_location_data = array_slice($record->additional_location_data, 0, 6);
+    
+    
+    
+    
                 $array[] = $record;
             }
             return $array;
         } else {
-            return [];
+            $array = array('status' => 'success');
+            return $array;
         }
     }
 
