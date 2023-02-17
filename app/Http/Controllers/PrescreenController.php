@@ -159,7 +159,7 @@ class PrescreenController extends Controller
         
         $bln_qualified = true;
         foreach($compareRecord as $compareLine) {
-            if ($compareLine->patient_response != $compareLine->question_correct) {
+            if ($compareLine->patient_response != $compareLine->question_correct && $compareLine->patient_response != "unknown") {
                 $bln_qualified = false;
             }
         }

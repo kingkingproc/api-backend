@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
 use Aws\Ses\SesClient;
 
+
 class UserCognitoController extends Controller
 {
     public function index()
