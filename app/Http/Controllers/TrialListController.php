@@ -213,6 +213,21 @@ class TrialListController extends Controller
                 $record->phase = "[0]";
             }
 
+            $scoring_array = null;
+            foreach ($testScoring as $score_record) {
+                if ($record->trial_id == $score_record->nct_id) {
+                $scoring_array[$score_record->variable] =$score_record->score;
+                }
+            }
+            if ($scoring_array == "" || $scoring_array = null || empty($scoring_array)) {
+                foreach ($testScoring as $score_record) {
+                    if ($score_record->nct_id == null) {
+                        $scoring_array[$score_record->variable] =$score_record->score;
+                        } 
+                    }
+            }
+
+
             // set all matching variables to false 
             $bln_brain_mets_match = false;
             $bln_brain_mets_fail = false;
@@ -338,272 +353,92 @@ class TrialListController extends Controller
                 }
             }
 
-            
+
+            /* check if heuristic variables are true, and add score */
             if ($bln_specificity_lvl_1) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_specificity_lvl_1') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_specificity_lvl_1') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_1";
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_1'];
+                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_1";    
+            }
+            elseif ($bln_specificity_lvl_2) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_2'];
+                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_2";    
+            }
+            elseif ($bln_specificity_lvl_3) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_3'];
+                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_3";    
+            }
+            elseif ($bln_specificity_lvl_4) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_4'];
+                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_4";    
+            }
+            elseif ($bln_specificity_lvl_5) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_5'];
+                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_5";    
+            }
+            elseif ($bln_specificity_lvl_6) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_6'];
+                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_6";    
+            }
+            else {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_7'];
+                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_7";    
             }
 
-            if ($bln_specificity_lvl_2) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_specificity_lvl_2') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_specificity_lvl_2') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_2";
-            }
-
-            if ($bln_specificity_lvl_3) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_specificity_lvl_3') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_specificity_lvl_3') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_3";
-            }
-
-            if ($bln_specificity_lvl_4) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_specificity_lvl_4') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_specificity_lvl_4') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_4";
-            }
-
-            if ($bln_specificity_lvl_5) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_specificity_lvl_5') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_specificity_lvl_5') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_5";
-            }
-
-            if ($bln_specificity_lvl_6) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_specificity_lvl_6') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_specificity_lvl_6') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_6";
-            }
-
-            if ($bln_specificity_lvl_7) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_specificity_lvl_7') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_specificity_lvl_7') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_7";
-            }
-
+ 
             if ($bln_biomarker_exclusion) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_biomarker_exclusion') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_biomarker_exclusion') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_exclusion'];
                 $record->search_result_string = $record->search_result_string . "-bln_biomarker_exclusion";
             }
 
             if ($bln_biomarker_inclusion) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_biomarker_inclusion') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_biomarker_inclusion') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_inclusion'];
                 $record->search_result_string = $record->search_result_string . "-bln_biomarker_inclusion";
             }
 
             if ($bln_prior_treatment_inclusion) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_prior_treatment_inclusion') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_prior_treatment_inclusion') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_prior_treatment_inclusion'];
                 $record->search_result_string = $record->search_result_string . "-bln_prior_treatment_inclusion";
             }
 
             if ($bln_prior_treatment_exclusion) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_prior_treatment_exclusion') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_prior_treatment_exclusion') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_prior_treatment_exclusion'];
                 $record->search_result_string = $record->search_result_string . "-bln_prior_treatment_exclusion";
             }
 
             if ($bln_sub_type) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_sub_type') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_sub_type') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_sub_type'];
                 $record->search_result_string = $record->search_result_string . "-bln_sub_type";
             }
 
             if ($bln_brain_mets_match) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_brain_mets_match') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_brain_mets_match') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_brain_mets_match'];
                 $record->search_result_string = $record->search_result_string . "-bln_brain_mets_match";
             } 
 
             if ($bln_brain_mets_fail) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_brain_mets_fail') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_brain_mets_fail') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_brain_mets_fail'];
                 $record->search_result_string = $record->search_result_string . "-bln_brain_mets_fail";
             } 
 
             if ($bln_stage) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_stage') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_stage') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_stage'];
                 $record->search_result_string = $record->search_result_string . "-bln_stage";
             }
 
             if ($bln_ecog) {
-                $bln_found = false;
-                foreach($testScoring as $score_rec) {
-                    if ($score_rec->nct_id == $record->nct_id && $score_rec->variable == 'bln_ecog') {
-                        $record->check_score = $score_rec->score;
-                        $bln_found = true;
-                    }
-                    if ($bln_found == false && $score_rec->nct_id == null && $score_rec->variable == 'bln_ecog') {
-                        $record->check_score = $score_rec->score;
-                    }                    
-
-                }
-                $record->search_result_score = $record->search_result_score+$record->check_score;
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_ecog'];
                 $record->search_result_string = $record->search_result_string . "-bln_ecog";
             }
 
 
 
 
-if ($record->search_result_score > 100) {
-    $record->search_result_score = 100;
-}
-if ($record->search_result_score < 0) {
-    $record->search_result_score = 0;
-}
+            if ($record->search_result_score > 100) {
+                $record->search_result_score = 100;
+            }
+            if ($record->search_result_score < 0) {
+                $record->search_result_score = 0;
+            }
 
             $record->biomarker_struct = $patientBiomarkerRecord;
             $record->is_brain_tumor = $patientDiagnosisRecord[0]['is_brain_tumor'];
