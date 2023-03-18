@@ -63,6 +63,8 @@ class SpecialistDetailController extends Controller
             }
             array_push($providerList,$record->provider_id);
 
+
+            
             $record->all_location = json_decode($record->all_location);
             $record->all_trials = json_decode($record->all_trials);
             $record->specialties = json_decode($record->specialties);
