@@ -318,6 +318,11 @@ class TrialListController extends Controller
                 $bln_brain_mets_fail = true;
             }
 
+            // new check if brain mets is only exclusion an patient does not match
+            if ($record->inclusion_brain_mets == null && $bln_brain_mets_fail == false) {
+                $bln_brain_mets_match = true;
+            }
+
             // check if patient has any of the trial's exclusion biomarkers
             if ($record->exclusion_biomarker != "" && $record->exclusion_biomarker != null && !empty($record->exclusion_biomarker)){
                 foreach($patientBiomarkerRecord as $indivBiomarker) {
@@ -395,6 +400,14 @@ class TrialListController extends Controller
                 $record->search_result_string = $record->search_result_string . "-bln_biomarker_inclusion";
             }
 
+                        // new check if inclusion biomarker is empty, and exclusion is not empty, but does not match
+                        if ($record->inclusion_biomarker == null && $record->exclusion_biomarker != null) {
+                            if (!$bln_biomarker_exclusion) {
+                                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_inclusion'];
+                                $record->search_result_string = $record->search_result_string . "-bln_biomarker_exclusion_inclusion";
+                            }
+                        }
+
             if ($bln_prior_treatment_inclusion) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_prior_treatment_inclusion'];
                 $record->search_result_string = $record->search_result_string . "-bln_prior_treatment_inclusion";
@@ -446,10 +459,10 @@ class TrialListController extends Controller
             $record->primary_purpose = ucwords($record->primary_purpose);
             $record->location_postal_code = $record->postal_code;
             unset($record->biomarker_struct);
-            unset($record->bln_inclusion_biomarker);
-            unset($record->bln_exclusion_biomarker);
+            /* unset($record->bln_inclusion_biomarker);
+            unset($record->bln_exclusion_biomarker); 
             unset($record->inclusion_biomarker);
-            unset($record->exclusion_biomarker);
+            unset($record->exclusion_biomarker); */
             unset($record->ecog);
             unset($record->current_trial_status_date);
             unset($record->study_first_posted);
