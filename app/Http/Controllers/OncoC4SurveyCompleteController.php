@@ -13,6 +13,7 @@ use App\Models\PatientContactData;
 use App\Models\LkupContactDataType;
 use App\Models\PatientDiagnosis;
 use App\Models\PatientDiagnosisTreatment;
+use App\Models\PatientDiagnosisBiomarker;
 use App\Models\PatientDiagnosisAdditional;
 use App\Models\PatientDiagnosisRemoteSite;
 
@@ -66,21 +67,19 @@ class OncoC4SurveyCompleteController extends Controller
             if ($request['bln_diagnosis']) {
                 $diagnosis_array['cancer_type_id'] = "213";
                 $diagnosis_array['is_metastatic'] = true;
+                $diagnosis_array['stage_id'] = "4";
             } else {
                 $diagnosis_array['cancer_type_id'] = "213";
                 $diagnosis_array['is_metastatic'] = false; 
             }
 
-            if ($request['bln_brain']) {
-                $diagnosis_array['is_brain_tumor'] = true;
-            } else {
-                $diagnosis_array['is_brain_tumor'] = false;
-            }
-
-            if ($request['bln_immunotherapy']) {
-                $treatment_array['treatment_id'] = 4;
+            if ($request['bln_mutation_kras']) {
+                $biomarker_array['biomarker_id'] = 47;
             } 
 
+            if ($request['bln_pd1']) {
+                $treatment_array['biomarker_id'] = 59;
+            }
             if ($request['bln_marketing']) {
                 $patient_array['shareInformation'] = false;
             } else {
@@ -134,17 +133,22 @@ class OncoC4SurveyCompleteController extends Controller
 
             $diagnosis_id = $diagnosis['diagnosis_id'];
 
-            $treatments_to_remove = PatientDiagnosisTreatment::where('diagnosis_id',$diagnosis_id)->get();
-            foreach ($treatments_to_remove as $to_remove) {
-                PatientDiagnosisTreatment::destroy($to_remove['id']);
+            $biomarkers_to_remove = PatientDiagnosisBiomarker::where('diagnosis_id',$diagnosis_id)->get();
+            foreach ($biomarkers_to_remove as $to_remove) {
+                PatientDiagnosisBiomarker::destroy($to_remove['id']);
             }
 
-            if (!empty($treatment_array['treatment_id'])) {
+            if (!empty($biomarker_array['biomarker_id'])) {
+                $biomarker_array['diagnosis_id']=$diagnosis_id;
+                PatientDiagnosisBiomarker::create($biomarker_array);
+            }
+
+            if (!empty($treatment_array['biomarker_id'])) {
                 $treatment_array['diagnosis_id']=$diagnosis_id;
-                PatientDiagnosisTreatment::create($treatment_array);
+                PatientDiagnosisBiomarker::create($treatment_array);
             }
 
-        if (($request['bln_age']) && ($request['bln_diagnosis']) && (!$request['bln_brain']) && (!$request['bln_mutation']) && ($request['bln_immunotherapy']) && ($request['bln_progressed'])) {
+        if (($request['bln_age'] == "true") && ($request['bln_diagnosis'] == "true") && ($request['bln_mutation_other'] != "true") && ($request['bln_pd1'] != "false") && ($request['bln_pd1_platinum'] != "false") && ($request['bln_pd1_progressed'] != "false") && ($request['bln_pd1_time'] != "false")) {
             $firstResults = DB::connection('pgsql2')->select(" 
             with cte_lat_long as (
                 select latitude,longitude from us where zipcode = '" . $request['zip_code'] . "'
@@ -234,8 +238,11 @@ class OncoC4SurveyCompleteController extends Controller
                 $array[] = $record;
             }
             return $array;
-        } else {
+        } elseif (($request['bln_age'] == "false") || ($request['bln_diagnosis'] == "false") || ($request['bln_mutation_other'] == "true") || ($request['bln_pd1'] == "false")) {
             $array = array('status' => 'success');
+            return $array;
+        } else {
+            $array = array('status' => 'maybe');
             return $array;
         }
     }

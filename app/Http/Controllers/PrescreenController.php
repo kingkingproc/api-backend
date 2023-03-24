@@ -22,6 +22,7 @@ class PrescreenController extends Controller
 
         $testResults = DB::connection('pgsql')->select("
             select 
+            id,
             question_text,
             question_variable,
             question_sequence,
@@ -49,58 +50,17 @@ class PrescreenController extends Controller
             $bln_is_eighteen = "false";
         }
 
-        // logic for immunotherapy
-        $treatment_records = PatientDiagnosisTreatment::where('diagnosis_id',$diagnosisRecord[0]["diagnosis_id"])->get();
-        $bln_prior_treatment = "false";
-        foreach($treatment_records as $treatment_record) {
-            if ($treatment_record->treatment_id == 4) {
-                $bln_prior_treatment = "true";
-            }
-        }
 
-        // logic for biomarkers
-        $biomarker_records = PatientDiagnosisBiomarker::where('diagnosis_id',$diagnosisRecord[0]["diagnosis_id"])->get();
-        $bln_biomarker = "false";
-        foreach($biomarker_records as $biomarker_record) {
-            if ($biomarker_record->biomarker_id == 34 || 
-                $biomarker_record->biomarker_id == 3 ||
-                $biomarker_record->biomarker_id == 61 ||
-                $biomarker_record->biomarker_id == 12 ||
-                $biomarker_record->biomarker_id == 54
-                ) {
-                $bln_biomarker = "true";
-            }
-        }
-
-        $bln_diagnosis = "false";
-        if ($diagnosisRecord[0]["is_metastatic"]) {
-            $bln_diagnosis = "true";
-        }
-
-        $bln_brain = "false";
-        if($diagnosisRecord[0]["is_brain_tumor"]){
-            $bln_brain = "true";
-        }
 
         foreach($testResults as $record) {
             if ($record->question_variable == "bln_age") {
                 $record->question_default = $bln_is_eighteen;
             }
-            if ($record->question_variable == "bln_diagnosis") {
-                $record->question_default = $bln_diagnosis;
-            }
-            if ($record->question_variable == "bln_brain") {
-                $record->question_default = $bln_brain;
-            }
-            if ($record->question_variable == "bln_immunotherapy") {
-                $record->question_default = $bln_prior_treatment;
-            }
-            if ($record->question_variable == "bln_mutation") {
-                $record->question_default = $bln_biomarker;
-            }            
+        
             $subTestResults = DB::connection('pgsql')->select("
             select option_text,option_value,option_sequence from  prescreen_questions_options 
             where question_variable = '" . $record->question_variable . "'
+            and question_id = '" . $record->id . "'
             ");
 
             $record->options = $subTestResults;
@@ -136,10 +96,13 @@ class PrescreenController extends Controller
         $insertData = [
             ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_age', 'patient_response'=>$request['bln_age']],
             ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_diagnosis', 'patient_response'=>$request['bln_diagnosis']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_brain', 'patient_response'=>$request['bln_brain']],
             ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_mutation', 'patient_response'=>$request['bln_mutation']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_immunotherapy', 'patient_response'=>$request['bln_immunotherapy']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_progressed', 'patient_response'=>$request['bln_progressed']],
+            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_mutation_kras', 'patient_response'=>$request['bln_mutation_kras']],
+            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_mutation_other', 'patient_response'=>$request['bln_mutation_other']],
+            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1', 'patient_response'=>$request['bln_pd1']],
+            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1_platinum', 'patient_response'=>$request['bln_pd1_platinum']],
+            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1_progressed', 'patient_response'=>$request['bln_pd1_progressed']],
+            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1_time', 'patient_response'=>$request['bln_pd1_time']],
         ];
         
         DB::table('prescreen_response')->insert($insertData);
