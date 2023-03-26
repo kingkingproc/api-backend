@@ -18,6 +18,7 @@ use App\Models\PatientDiagnosisAdditional;
 use App\Models\PatientDiagnosisRemoteSite;
 
 use Illuminate\Support\Facades\DB;
+use ActiveCampaign;
 
 class OncoC4SurveyCompleteController extends Controller
 {
@@ -115,6 +116,21 @@ class OncoC4SurveyCompleteController extends Controller
                 $patient = patient::create($patient_array);
             }
            
+            //after creating or updating the patient record, sent the contact to ActiveCampaign
+            $activeCampaign = app(ActiveCampaign::class);
+
+            $data = [
+                'email' => $patient_array['email'],
+                'first_name' => $patient_array['name_first'],
+                'last_name' => $patient_array['name_last'],
+                'p[4]' => '4',
+            ];
+            
+            $results = $activeCampaign->api('contact/add', $data);
+            if (!(int)$results->success) {
+                // means active campaign failed, not sure what to do with it.
+            }
+
             //put diagnosis request data into array
             $diagnosis_array['patient_id']=$patient['patient_id'];
 

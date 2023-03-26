@@ -144,6 +144,7 @@ class TrialListController extends Controller
                             inner join trials_" . $string_tableName . "_thin_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_thin_full.trial_id
                             and cte_distinct_location.location_id = trials_" . $string_tableName . "_thin_full.location_id
                             inner join us on trials_" . $string_tableName . "_thin_full.postal_code = us.zipcode
+                            --where trials_" . $string_tableName . "_thin_full.nct_id = 'NCT04725188'
                             order by cte_distinct_location.distance"
                 );
 
@@ -335,15 +336,26 @@ class TrialListController extends Controller
                 }
             } 
 
-            // check if patient has any of the trial's inclusion biomarkers
+            // check if patient has all of the trial's inclusion biomarkers
             if ($record->inclusion_biomarker != "" && $record->inclusion_biomarker != null && !empty($record->inclusion_biomarker)){
-                foreach($patientBiomarkerRecord as $indivBiomarker) {
-                    $pieces = explode(" ", $indivBiomarker->biomarker_synonyms);
-                    foreach($pieces as $piece)
-                    if (stripos($record->inclusion_biomarker, strtolower($piece))) {
-                        $bln_biomarker_inclusion = true;
+                $bln_biomarker_inclusion = true;
+                // clean and make an array of the trials inclusion biomarkers
+                $inclusion_biomarker_list = str_replace("{", "", $record->inclusion_biomarker);
+                $inclusion_biomarker_list = str_replace("}", "", $inclusion_biomarker_list); 
+                $trial_inclusion_biomarker_array = explode (",", $inclusion_biomarker_list);
 
-                    }
+                // make an array of the patients biomarkers synonyms
+                unset($patient_inclusion_biomarker_array);
+                foreach($patientBiomarkerRecord as $indivBiomarker) {
+                    $patient_inclusion_biomarker_array[] = $indivBiomarker->biomarker_synonyms;
+                }
+                $record->user_inclusion_biomarker = $patient_inclusion_biomarker_array;
+                // make sure each & all of the trial biomarkers are in the patients biomarkers array
+                foreach($trial_inclusion_biomarker_array as $individual_inclusion_biomarker) {
+                        //if any trial biomarker is not in the patients array, then inclusion fails
+                        if (!strpos_arr(json_encode($patient_inclusion_biomarker_array), strtolower($individual_inclusion_biomarker))) {
+                            $bln_biomarker_inclusion = false;
+                        }
                 }
             }
 

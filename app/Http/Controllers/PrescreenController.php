@@ -11,10 +11,12 @@ use App\Models\PatientDiagnosisTreatment;
 use App\Models\PatientDiagnosisBiomarker;
 use Illuminate\Support\Facades\DB;
 
+
 class PrescreenController extends Controller
 {
     public function index()
     {
+
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
         $patientRecord = patient::where('sub',$the_object->sub)->get();
