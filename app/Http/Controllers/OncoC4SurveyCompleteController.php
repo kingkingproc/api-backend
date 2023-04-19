@@ -164,6 +164,34 @@ class OncoC4SurveyCompleteController extends Controller
                 PatientDiagnosisBiomarker::create($treatment_array);
             }
 
+            $var_prescreen_id = 3;
+
+            $testResults = DB::connection('pgsql')->select(" 
+            delete from  prescreen_response
+            where prescreen_id = '" . $var_prescreen_id . "'
+            and patient_id = '" . $patientRecord[0]['patient_id'] . "'
+            ");
+ 
+            $testResults = DB::connection('pgsql')->select(" 
+            delete from  prescreen_patient_ref
+            where prescreen_id = '" . $var_prescreen_id . "'
+            and patient_id = '" . $patientRecord[0]['patient_id'] . "'
+            ");
+
+            $insertData = [
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_age', 'patient_response'=>$request['bln_age']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_diagnosis', 'patient_response'=>$request['bln_diagnosis']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_mutation', 'patient_response'=>$request['bln_mutation']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_mutation_kras', 'patient_response'=>$request['bln_mutation_kras']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_mutation_other', 'patient_response'=>$request['bln_mutation_other']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1', 'patient_response'=>$request['bln_pd1']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1_platinum', 'patient_response'=>$request['bln_pd1_platinum']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1_progressed', 'patient_response'=>$request['bln_pd1_progressed']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'question_variable'=>'bln_pd1_time', 'patient_response'=>$request['bln_pd1_time']],
+            ];
+            
+            DB::table('prescreen_response')->insert($insertData);
+
         if (($request['bln_age'] == "true") && ($request['bln_diagnosis'] == "true") && ($request['bln_mutation_other'] != "true") && ($request['bln_pd1'] != "false") && ($request['bln_pd1_platinum'] != "false") && ($request['bln_pd1_progressed'] != "false") && ($request['bln_pd1_time'] != "false")) {
             $firstResults = DB::connection('pgsql2')->select(" 
             with cte_lat_long as (
@@ -253,14 +281,32 @@ class OncoC4SurveyCompleteController extends Controller
     
                 $array[] = $record;
             }
+            $insertData = [
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'patient_eligible'=>'user_eligible'],
+            ];
+            DB::table('prescreen_patient_ref')->insert($insertData);
+
             return $array;
         } elseif (($request['bln_age'] == "false") || ($request['bln_diagnosis'] == "false") || ($request['bln_mutation_other'] == "true") || ($request['bln_pd1'] == "false")) {
+
+            $insertData = [
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'patient_eligible'=>'user_ineligible'],
+            ];
+            DB::table('prescreen_patient_ref')->insert($insertData);
+
             $array = array('status' => 'success');
             return $array;
         } else {
+
+            $insertData = [
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'patient_eligible'=>'user_maybe'],
+            ];
+            DB::table('prescreen_patient_ref')->insert($insertData);
+
             $array = array('status' => 'maybe');
             return $array;
         }
     }
+
 
 }

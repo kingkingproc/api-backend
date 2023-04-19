@@ -66,7 +66,7 @@ class UserCognitoController extends Controller
         $sender_email = 'info@cheryl.app';
         $recipient_emails = ['mattk@abunchofcreators.com','mking@abunchofcreators.com'];
 
-        try {
+        //try {
             $result = $SesClient->sendTemplatedEmail([
                 'Destination' => [
                     'ToAddresses' => $recipient_emails,
@@ -78,11 +78,11 @@ class UserCognitoController extends Controller
                 'TemplateData' => '{ }'
             ]);
             return($result);
-        } catch (AwsException $e) {
+       // } catch (AwsException $e) {
             // output error message if fails
-            return $e->getMessage();
+       //     return $e->getMessage();
             
-        }
+       // }
     }
 
 }

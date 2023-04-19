@@ -28,6 +28,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::post('/prescreen','App\Http\Controllers\PrescreenController@index');
 Route::put('/prescreen','App\Http\Controllers\PrescreenController@update');
 
+// new pre screen tab routes for testing
+Route::get('/prescreen_tab','App\Http\Controllers\PrescreenTabController@index');
+Route::put('/prescreen_tab','App\Http\Controllers\PrescreenTabController@update');
+
+
 Route::resource('address','App\Http\Controllers\AddressController');
 Route::resource('patient','App\Http\Controllers\PatientController');
 Route::resource('newsletter','App\Http\Controllers\NewsletterController');

@@ -25,7 +25,8 @@ class PatientDiagnosis extends Model
         'is_brain_tumor',
         'is_metastatic',
         'cancer_sub_type_id',
-        'is_treatment_started'
+        'is_treatment_started',
+        'is_biomarker_started'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

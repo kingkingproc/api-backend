@@ -13,6 +13,7 @@ use App\Models\address;
 use App\Models\PatientDiagnosisBiomarker;
 
 
+
 use Illuminate\Support\Facades\DB;
 
 // simple function to compare elements within arrays
@@ -55,6 +56,16 @@ class TrialListController extends Controller
             $string_tableName = "nsclc";
         }       
 
+        $all_subtype_sysnonyms =  DB::connection('pgsql')->select("
+        select lk.cancer_sub_type_synonyms from lkup_patient_diagnosis_cancer_sub_types lk
+        where lk.cancer_type_id = " . $patientDiagnosisRecord[0]['cancer_type_id'] . "
+        ");
+
+        foreach($all_subtype_sysnonyms as $synonym) {
+            $subtypeArray[] = $synonym->cancer_sub_type_synonyms;
+        }
+
+
         if ($patientDiagnosisRecord[0]['is_brain_tumor'] && $patientDiagnosisRecord[0]['is_metastatic']) {
             $patientHasBrainMets = true;
         } else{
@@ -89,6 +100,7 @@ class TrialListController extends Controller
 
         
         $searchEcog = $patientDiagnosisRecord[0]->performance_score_id;
+        $searchEcog = $searchEcog-1;
         $searchStage = $patientDiagnosisRecord[0]->stage_id;
 
         $addressRecord = address::find($patientRecord[0]['address_id']);
@@ -144,7 +156,7 @@ class TrialListController extends Controller
                             inner join trials_" . $string_tableName . "_thin_full on cte_distinct_location.trial_id = trials_" . $string_tableName . "_thin_full.trial_id
                             and cte_distinct_location.location_id = trials_" . $string_tableName . "_thin_full.location_id
                             inner join us on trials_" . $string_tableName . "_thin_full.postal_code = us.zipcode
-                            --where trials_" . $string_tableName . "_thin_full.nct_id = 'NCT04725188'
+                            --where trials_" . $string_tableName . "_thin_full.nct_id = 'NCT05498428'
                             order by cte_distinct_location.distance"
                 );
 
@@ -233,12 +245,21 @@ class TrialListController extends Controller
             $bln_brain_mets_match = false;
             $bln_brain_mets_fail = false;
             $bln_sub_type = false;
+            $bln_any_sub_type = false;
             $bln_biomarker_inclusion = false;
+            $bln_biomarker_inclusion_0 = false;
+            $bln_biomarker_inclusion_70 = false;
+            $bln_biomarker_inclusion_90 = false;
+            $bln_biomarker_inclusion_100 = false;
             $bln_biomarker_exclusion = false;
             $bln_prior_treatment_inclusion = false;
             $bln_prior_treatment_exclusion = false;
             $bln_ecog = false;
+            $bln_ecog_inclusion = false;
+            $bln_ecog_exclusion = false;
             $bln_stage = false;
+            $bln_stage_inclusion = false;
+            $bln_stage_exclusion = false;
             $bln_specificity_lvl_1 = false;
             $bln_specificity_lvl_2 = false;
             $bln_specificity_lvl_3 = false;
@@ -249,7 +270,7 @@ class TrialListController extends Controller
 
 
             $record->search_result_score = 0.0;
-            $record->search_result_string = "Matching-";
+            $record->search_result_string = "Matching ";
             
             /* large ifelse statement to find the specificity of the disease to trial */
             if (stripos(" " . $record->trial_title, $searchTerm) && stripos($record->disease_arr, $searchTerm) && $record->disease_count <= 5) {
@@ -279,6 +300,11 @@ class TrialListController extends Controller
             // end specificity
 
             /* check if cancer sub type in title or disease list */
+            foreach($subtypeArray as $subtype){
+                if (strpos($record->trial_title,$subtype) || strpos_arr($record->disease_arr,$subtype)) {
+                    $bln_any_sub_type = true;
+                }
+            }
             if (strpos_arr(" " . $record->trial_title, explode(",",$array_search_sub_disease)) || strpos_arr($record->disease_arr, explode(",",$array_search_sub_disease))) {
                 $bln_sub_type = true;
             } 
@@ -287,78 +313,136 @@ class TrialListController extends Controller
                 $bln_sub_type = false;
             } 
 
-
-
             //stage matching
-            if (!is_null($record->stage)) {
-                try {
-                    if (str_contains($record->stage, $searchStage)) {
-                        $bln_stage = true;
-                    }
-                } catch (\Exception $e) {
-                    
-                }
+            if (!is_null($record->stage) && !is_null($searchStage)) {
+                $bln_stage = true;
             }
+            if ($bln_stage) {
+                    if (str_contains($record->stage, $searchStage)) {
+                        $bln_stage_inclusion = true;
+                    } else {
+                        $bln_stage_exclusion = true;
+                    }
+            }
+            
 
             //ecog matching
-            if (!is_null($record->ecog)) {
-                try {
+            if (!is_null($record->ecog) && !is_null($searchEcog)) {
+                $bln_ecog = true;
+            }
+            if ($bln_ecog) {
                     if (str_contains($record->ecog, $searchEcog)) {
-                        $bln_ecog = true;
+                        $bln_ecog_inclusion = true;
+                    } else {
+                        $bln_ecog_exclusion = true;
                     }
-                } catch (\Exception $e) {
-                    
-                }
             }
 
+            $record->patient_has_brain_mets = $patientHasBrainMets;
             // match brain mets inclusion & exclusion (match/fail)
-            if ($patientHasBrainMets && stripos($record->inclusion_brain_mets,"true")) {
+            if ($patientHasBrainMets && $record->inclusion_brain_mets == "true") {
                 $bln_brain_mets_match = true;
             }
-            if ($patientHasBrainMets && stripos($record->exclusion_brain_mets,"true")) {
+            if ($patientHasBrainMets && $record->exclusion_brain_mets == "true") {
                 $bln_brain_mets_fail = true;
             }
+
+
 
             // new check if brain mets is only exclusion an patient does not match
             if ($record->inclusion_brain_mets == null && $bln_brain_mets_fail == false) {
                 $bln_brain_mets_match = true;
             }
 
-            // check if patient has any of the trial's exclusion biomarkers
-            if ($record->exclusion_biomarker != "" && $record->exclusion_biomarker != null && !empty($record->exclusion_biomarker)){
-                foreach($patientBiomarkerRecord as $indivBiomarker) {
-                    $pieces = explode(" ", $indivBiomarker->biomarker_synonyms);
-                    foreach($pieces as $piece)
-                    if (stripos($record->exclusion_biomarker, strtolower($piece))) {
-                        $bln_biomarker_exclusion = true;
+            
 
-                    }
-                }
-            } 
-
-            // check if patient has all of the trial's inclusion biomarkers
-            if ($record->inclusion_biomarker != "" && $record->inclusion_biomarker != null && !empty($record->inclusion_biomarker)){
-                $bln_biomarker_inclusion = true;
-                // clean and make an array of the trials inclusion biomarkers
-                $inclusion_biomarker_list = str_replace("{", "", $record->inclusion_biomarker);
-                $inclusion_biomarker_list = str_replace("}", "", $inclusion_biomarker_list); 
-                $trial_inclusion_biomarker_array = explode (",", $inclusion_biomarker_list);
-
-                // make an array of the patients biomarkers synonyms
-                unset($patient_inclusion_biomarker_array);
-                foreach($patientBiomarkerRecord as $indivBiomarker) {
-                    $patient_inclusion_biomarker_array[] = $indivBiomarker->biomarker_synonyms;
-                }
-                $record->user_inclusion_biomarker = $patient_inclusion_biomarker_array;
-                // make sure each & all of the trial biomarkers are in the patients biomarkers array
-                foreach($trial_inclusion_biomarker_array as $individual_inclusion_biomarker) {
-                        //if any trial biomarker is not in the patients array, then inclusion fails
-                        if (!strpos_arr(json_encode($patient_inclusion_biomarker_array), strtolower($individual_inclusion_biomarker))) {
-                            $bln_biomarker_inclusion = false;
-                        }
-                }
+            //check if the patient has even filled in biomarker drop down
+            if (empty($patientBiomarkerRecord)) {
+                $bln_biomarker_inclusion_0 = true;
             }
 
+            if ( //patient & both inclusion and exclusion are all empty
+                ($bln_biomarker_inclusion_0) &&
+                ($record->exclusion_biomarker == "" || $record->exclusion_biomarker == null || empty($record->exclusion_biomarker)) &&
+                ($record->inclusion_biomarker == "" || $record->inclusion_biomarker == null || empty($record->inclusion_biomarker))
+                ) {
+                    $bln_biomarker_inclusion_70 = true;
+                }
+
+            if ( //patient & both inclusion are both empty, but exclusion is not
+                ($bln_biomarker_inclusion_0) &&
+                ($record->inclusion_biomarker == "" || $record->inclusion_biomarker == null || empty($record->inclusion_biomarker)) &&
+                ($record->exclusion_biomarker <> "" && $record->exclusion_biomarker <> null && !empty($record->exclusion_biomarker))
+                ) {
+                    $bln_biomarker_inclusion_90 = true;
+                }                
+    
+            if (!$bln_biomarker_inclusion_0){
+                // check if patient has any of the trial's exclusion biomarkers
+                if ($record->exclusion_biomarker != "" && $record->exclusion_biomarker != null && !empty($record->exclusion_biomarker)){
+                    foreach($patientBiomarkerRecord as $indivBiomarker) {
+                        $pieces = explode(" ", $indivBiomarker->biomarker_synonyms);
+                        foreach($pieces as $piece)
+                        if (stripos($record->exclusion_biomarker, strtolower($piece))) {
+                            $bln_biomarker_exclusion = true;
+
+                        }
+                    }
+                } 
+            }
+            
+            if (!$bln_biomarker_inclusion_0 && !$bln_biomarker_exclusion) {
+                
+                // check if patient has all of the trial's inclusion biomarkers
+                if ($record->inclusion_biomarker != "" && $record->inclusion_biomarker != null && !empty($record->inclusion_biomarker)){
+                    
+                    $bln_biomarker_inclusion = true;
+                    // clean and make an array of the trials inclusion biomarkers
+                    $inclusion_biomarker_list = str_replace("{", "", $record->inclusion_biomarker);
+                    $inclusion_biomarker_list = str_replace("}", "", $inclusion_biomarker_list); 
+                    $trial_inclusion_biomarker_array = explode (",", $inclusion_biomarker_list);
+
+                    // make an array of the patients biomarkers synonyms
+                    unset($patient_inclusion_biomarker_array);
+                    foreach($patientBiomarkerRecord as $indivBiomarker) {
+                        $patient_inclusion_biomarker_array[] = $indivBiomarker->biomarker_synonyms;
+                    }
+                    
+                    
+                    $record->user_inclusion_biomarker = $patient_inclusion_biomarker_array;
+                    // make sure each & all of the trial biomarkers are in the patients biomarkers array
+                    foreach($trial_inclusion_biomarker_array as $individual_inclusion_biomarker) {
+                            //if any trial biomarker is not in the patients array, then inclusion fails
+                            if (!stripos(json_encode($patient_inclusion_biomarker_array), strtolower($individual_inclusion_biomarker))) {
+                                $bln_biomarker_inclusion = false;
+                            }
+                    }
+                //else if trials biomarker inclusion is empty
+                
+                } else {
+                    
+                    if ($record->exclusion_biomarker == "" || $record->exclusion_biomarker == null || empty($record->exclusion_biomarker)){
+                        $bln_biomarker_inclusion_70 = true;
+                    } else {
+                        $bln_biomarker_inclusion = true;
+                    }
+                }
+
+                if ($bln_biomarker_inclusion) {
+                    foreach($patientBiomarkerRecord as $indivBiomarker) {
+                        if (strpos(strtolower($record->trial_title),strtolower($indivBiomarker->biomarker_synonyms))) {
+                            $bln_biomarker_inclusion_100 = true;
+                        }
+                    }
+                    
+                    if (!$bln_biomarker_inclusion_100) {
+                        $bln_biomarker_inclusion_90 = true;
+                    }
+                }
+            
+
+            }
+            
             // check if patient has any of the trial's inclusion prior treatment biomarkers
             if ($record->inclusion_prior_treatment != "" && $record->inclusion_prior_treatment != null && !empty($record->inclusion_prior_treatment)){
                 foreach($patientBiomarkerRecord as $indivBiomarker) {
@@ -374,44 +458,56 @@ class TrialListController extends Controller
             /* check if heuristic variables are true, and add score */
             if ($bln_specificity_lvl_1) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_1'];
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_1";    
+                $record->search_result_string = $record->search_result_string . " specificity_lvl_1 ";    
             }
             elseif ($bln_specificity_lvl_2) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_2'];
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_2";    
+                $record->search_result_string = $record->search_result_string . " specificity_lvl_2 ";    
             }
             elseif ($bln_specificity_lvl_3) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_3'];
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_3";    
+                $record->search_result_string = $record->search_result_string . " specificity_lvl_3 ";    
             }
             elseif ($bln_specificity_lvl_4) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_4'];
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_4";    
+                $record->search_result_string = $record->search_result_string . " specificity_lvl_4 ";    
             }
             elseif ($bln_specificity_lvl_5) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_5'];
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_5";    
+                $record->search_result_string = $record->search_result_string . " specificity_lvl_5 ";    
             }
             elseif ($bln_specificity_lvl_6) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_6'];
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_6";    
+                $record->search_result_string = $record->search_result_string . " specificity_lvl_6 ";    
             }
-            else {
+            elseif ($bln_specificity_lvl_7) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_specificity_lvl_7'];
-                $record->search_result_string = $record->search_result_string . "-bln_specificity_lvl_7";    
+                $record->search_result_string = $record->search_result_string . " specificity_lvl_7 ";    
             }
 
  
             if ($bln_biomarker_exclusion) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_exclusion'];
-                $record->search_result_string = $record->search_result_string . "-bln_biomarker_exclusion";
+                $record->search_result_string = $record->search_result_string . " biomarker_exclusion ";
+            } elseif ($bln_biomarker_inclusion_100) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_inclusion_100'];
+                $record->search_result_string = $record->search_result_string . " biomarker_inclusion_100 ";
+            } elseif ($bln_biomarker_inclusion_90) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_inclusion_90'];
+                $record->search_result_string = $record->search_result_string . " biomarker_inclusion_90 ";
+            } elseif ($bln_biomarker_inclusion_70) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_inclusion_70'];
+                $record->search_result_string = $record->search_result_string . " biomarker_inclusion_70 ";
+            } elseif ($bln_biomarker_inclusion_0) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_inclusion_0'];
+                $record->search_result_string = $record->search_result_string . " biomarker_inclusion_0 ";
+            } elseif (!$bln_biomarker_inclusion) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_exclusion'];
+                $record->search_result_string = $record->search_result_string . " biomarker_no_inclusion ";
             }
 
-            if ($bln_biomarker_inclusion) {
-                $record->search_result_score = $record->search_result_score+$scoring_array['bln_biomarker_inclusion'];
-                $record->search_result_string = $record->search_result_string . "-bln_biomarker_inclusion";
-            }
 
+/*
                         // new check if inclusion biomarker is empty, and exclusion is not empty, but does not match
                         if ($record->inclusion_biomarker == null && $record->exclusion_biomarker != null) {
                             if (!$bln_biomarker_exclusion) {
@@ -419,40 +515,54 @@ class TrialListController extends Controller
                                 $record->search_result_string = $record->search_result_string . "-bln_biomarker_exclusion_inclusion";
                             }
                         }
-
+*/
             if ($bln_prior_treatment_inclusion) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_prior_treatment_inclusion'];
-                $record->search_result_string = $record->search_result_string . "-bln_prior_treatment_inclusion";
+                $record->search_result_string = $record->search_result_string . " prior_treatment_inclusion ";
             }
 
             if ($bln_prior_treatment_exclusion) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_prior_treatment_exclusion'];
-                $record->search_result_string = $record->search_result_string . "-bln_prior_treatment_exclusion";
+                $record->search_result_string = $record->search_result_string . " prior_treatment_exclusion ";
             }
 
+            if ($bln_any_sub_type && !$bln_sub_type) {
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_sub_type_exclusion'];
+                $record->search_result_string = $record->search_result_string . " sub_type_exclusion ";
+            }
             if ($bln_sub_type) {
-                $record->search_result_score = $record->search_result_score+$scoring_array['bln_sub_type'];
-                $record->search_result_string = $record->search_result_string . "-bln_sub_type";
+                $record->search_result_score = $record->search_result_score+$scoring_array['bln_sub_type_inclusion'];
+                $record->search_result_string = $record->search_result_string . " sub_type_inclusion ";
             }
 
             if ($bln_brain_mets_match) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_brain_mets_match'];
-                $record->search_result_string = $record->search_result_string . "-bln_brain_mets_match";
+                $record->search_result_string = $record->search_result_string . " brain_mets_match ";
             } 
 
             if ($bln_brain_mets_fail) {
                 $record->search_result_score = $record->search_result_score+$scoring_array['bln_brain_mets_fail'];
-                $record->search_result_string = $record->search_result_string . "-bln_brain_mets_fail";
+                $record->search_result_string = $record->search_result_string . " brain_mets_fail ";
             } 
 
             if ($bln_stage) {
-                $record->search_result_score = $record->search_result_score+$scoring_array['bln_stage'];
-                $record->search_result_string = $record->search_result_string . "-bln_stage";
+                if($bln_stage_inclusion) {
+                    $record->search_result_score = $record->search_result_score+$scoring_array['bln_stage_inclusion'];
+                    $record->search_result_string = $record->search_result_string . " stage_inclusion ";
+                } else {
+                    $record->search_result_score = $record->search_result_score+$scoring_array['bln_stage_exclusion'];
+                    $record->search_result_string = $record->search_result_string . " stage_exclusion ";
+                }
             }
 
             if ($bln_ecog) {
-                $record->search_result_score = $record->search_result_score+$scoring_array['bln_ecog'];
-                $record->search_result_string = $record->search_result_string . "-bln_ecog";
+                if($bln_ecog_inclusion) {
+                    $record->search_result_score = $record->search_result_score+$scoring_array['bln_ecog_inclusion'];
+                    $record->search_result_string = $record->search_result_string . " ecog_inclusion ";
+                } else {
+                    $record->search_result_score = $record->search_result_score+$scoring_array['bln_ecog_exclusion'];
+                    $record->search_result_string = $record->search_result_string . " ecog_exclusion ";
+                }
             }
 
 
@@ -464,6 +574,8 @@ class TrialListController extends Controller
             if ($record->search_result_score < 0) {
                 $record->search_result_score = 0;
             }
+
+            $record->search_result_string = $record->search_result_string . " -" . $record->search_result_score . "-";
 
             $record->biomarker_struct = $patientBiomarkerRecord;
             $record->is_brain_tumor = $patientDiagnosisRecord[0]['is_brain_tumor'];
