@@ -61,8 +61,29 @@ class TrialDetailController extends Controller
             $record->primary_purpose = ucwords($record->primary_purpose);
 
             $locationResults = DB::connection('pgsql2')->select(" 
-                select location.* from
-                location inner join trials_additional_locations on location.location_id = trials_additional_locations.additional_location_id
+                select 
+                location.location_id,
+                COALESCE(s.location_standard_name,location.location_name) location_name,
+                COALESCE(s.location_standard_address_line_1,location.address_line_1) address_line_1,
+                location.address_line_2,
+                COALESCE(s.location_city,location.city) city,
+                location.state,
+                COALESCE(s.location_zip_code,location.postal_code) postal_code,
+                location.country,
+                location.location_source,
+                location.location_contact_email,
+                location.location_contact_last_name,
+                location.location_contact_phone,
+                location.location_contact_phone_ext,
+                location.location_contact_backup_email,
+                location.location_contact_backup_last_name
+                from
+                location inner join trials_additional_locations 
+                    on location.location_id = trials_additional_locations.additional_location_id
+                left join location_location_standard_ref r 
+                    on cast(trials_additional_locations.additional_location_id as integer) = r.location_id
+                left join location_standard s 
+                    on s.location_standard_id = r.location_standard_id
                 where trials_additional_locations.base_trial_id = '". $record->trial_id ."'
                 and trials_additional_locations.base_location_id = '". $record->location_id ."'
                 ");
