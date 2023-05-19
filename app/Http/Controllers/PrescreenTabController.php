@@ -16,7 +16,7 @@ class PrescreenTabController extends Controller
 
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
         
         $prescreenResults = DB::connection('pgsql')->select("
@@ -99,7 +99,7 @@ class PrescreenTabController extends Controller
     {
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
                 $deleted = DB::connection('pgsql')->delete("
                 delete from prescreen_response 
@@ -111,19 +111,29 @@ class PrescreenTabController extends Controller
                 where prescreen_patient_ref.patient_id = '" . $patientRecord[0]['patient_id'] . "'
                 and prescreen_patient_ref.prescreen_id = '" . $request["prescreen_id"] . "'
                 ");
+        if ($request["prescreen_id"] == "3"){
+            $insertData = [
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_age', 'patient_response'=>$request['bln_age']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_diagnosis', 'patient_response'=>$request['bln_diagnosis']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_mutation', 'patient_response'=>$request['bln_mutation']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_mutation_kras', 'patient_response'=>$request['bln_mutation_kras']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_mutation_other', 'patient_response'=>$request['bln_mutation_other']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1', 'patient_response'=>$request['bln_pd1']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1_platinum', 'patient_response'=>$request['bln_pd1_platinum']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1_progressed', 'patient_response'=>$request['bln_pd1_progressed']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1_time', 'patient_response'=>$request['bln_pd1_time']],
+            ];
+        }else{
 
-        $insertData = [
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_age', 'patient_response'=>$request['bln_age']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_diagnosis', 'patient_response'=>$request['bln_diagnosis']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_mutation', 'patient_response'=>$request['bln_mutation']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_mutation_kras', 'patient_response'=>$request['bln_mutation_kras']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_mutation_other', 'patient_response'=>$request['bln_mutation_other']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1', 'patient_response'=>$request['bln_pd1']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1_platinum', 'patient_response'=>$request['bln_pd1_platinum']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1_progressed', 'patient_response'=>$request['bln_pd1_progressed']],
-            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_pd1_time', 'patient_response'=>$request['bln_pd1_time']],
-        ];
-        
+            $insertData = [
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'sel_melanoma_subtype', 'patient_response'=>$request['sel_melanoma_subtype']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'sel_melanoma_stage', 'patient_response'=>$request['sel_melanoma_stage']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'bln_brain_spinal', 'patient_response'=>$request['bln_brain_spinal']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'sel_melanoma_ecog', 'patient_response'=>$request['sel_melanoma_ecog']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'sel_melanoma_treatment', 'patient_response'=>$request['sel_melanoma_treatment']],
+                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'question_variable'=>'sel_melanoma_biomarker', 'patient_response'=>$request['sel_melanoma_biomarker']],
+            ];
+        }
         DB::table('prescreen_response')->insert($insertData);
 
         $compareRecord = DB::connection('pgsql')->select("
@@ -145,19 +155,51 @@ class PrescreenTabController extends Controller
                 $bln_qualified = false;
             }
         }
+        
+        if ($request["prescreen_id"] == "3") {
+                    $var_prescreen_id = 3;
+                    if (($request['bln_age'] == "true") && ($request['bln_diagnosis'] == "true") && ($request['bln_mutation_other'] == "false") && ($request['bln_pd1'] == "true") && ($request['bln_pd1_platinum'] == "true") && ($request['bln_pd1_progressed']  == "true") && ($request['bln_pd1_time']  == "true")) {
 
-        if ($bln_qualified) {
-            $insertData = [
-                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'patient_eligible'=>'user_eligible'],
-            ];
-            DB::table('prescreen_patient_ref')->insert($insertData);
-            return array('status' => 'user_eligible');
+                        $insertData = [
+                            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'patient_eligible'=>'user_eligible'],
+                        ];
+                        DB::table('prescreen_patient_ref')->insert($insertData);
+
+                        $array = array('status' => 'user_eligible');
+                        return $array;
+                    } elseif (($request['bln_age'] == "false") || ($request['bln_diagnosis'] == "false") || ($request['bln_mutation_other'] == "true") || ($request['bln_pd1'] == "false") || ($request['bln_pd1_platinum'] == "false")) {
+
+                        $insertData = [
+                            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'patient_eligible'=>'user_ineligible'],
+                        ];
+                        DB::table('prescreen_patient_ref')->insert($insertData);
+
+                        $array = array('status' => 'user_ineligible');
+                        return $array;
+                    } else {
+
+                        $insertData = [
+                            ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$var_prescreen_id, 'patient_eligible'=>'user_maybe'],
+                        ];
+                        DB::table('prescreen_patient_ref')->insert($insertData);
+
+                        $array = array('status' => 'user_maybe');
+                        return $array;
+                    }
         } else {
-            $insertData = [
-                ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'patient_eligible'=>'user_ineligible'],
-            ];
-            DB::table('prescreen_patient_ref')->insert($insertData);
-            return array('status' => 'user_ineligible');
+                if ($bln_qualified) {
+                    $insertData = [
+                        ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'patient_eligible'=>'user_eligible'],
+                    ];
+                    DB::table('prescreen_patient_ref')->insert($insertData);
+                    return array('status' => 'user_eligible');
+                } else {
+                    $insertData = [
+                        ['patient_id'=>$patientRecord[0]['patient_id'], 'prescreen_id'=>$request["prescreen_id"], 'patient_eligible'=>'user_ineligible'],
+                    ];
+                    DB::table('prescreen_patient_ref')->insert($insertData);
+                    return array('status' => 'user_ineligible');
+                }
         }
         
     }

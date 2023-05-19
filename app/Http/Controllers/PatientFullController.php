@@ -55,7 +55,7 @@ class PatientFullController extends Controller
         $request = request();
         $the_object = self::verifyJasonToken($request);
         //return $jwtPayload->sub;
-        $patientRecord = Patient::where('sub',$the_object->sub)->get();
+        $patientRecord = Patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         if ($patientRecord == "[]") {
             $array['sub'] = $the_object->sub;
             //return json_encode(['patient'=>surveystepone::create(array("['sub'=>$jwtPayload->sub]"))]);

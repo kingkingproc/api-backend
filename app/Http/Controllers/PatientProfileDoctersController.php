@@ -43,7 +43,7 @@ class PatientProfileDoctersController extends Controller
         $request = request();
         $the_object = self::verifyJasonToken($request);
             // Get the patient record for the sub
-            $patientRecord = patient::where('sub',$the_object->sub)->get();
+            $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
         $patientId = $patientRecord[0]['patient_id'];
 

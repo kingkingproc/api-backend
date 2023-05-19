@@ -86,18 +86,20 @@ class SurveyCompleteController extends Controller
         $request = request();
         $the_object = self::verifyJasonToken($request);
             // Get the patient record for the sub
-            $patientRecord = patient::where('sub',$the_object->sub)->get();
+            $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
             // put patient request data into array
             $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
             $patient_array['ethnicity_id']=$request['ethnicity'];
             $patient_array['education_level']=$request['education_level'];
             $patient_array['is_medicaid_patient']=$request['is_medicaid_patient'];
-            $patient_array['email'] = (isset($request['email'])?$request['email']:"");
+            $patient_array['email'] = $the_object->email;
+            $patient_array['sub'] = $the_object->sub;
             $patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
             $patient_array['termsAgreement'] = (isset($request['termsAgreement'])?$request['termsAgreement']:0);
             $patient_array['shareInformation'] = (isset($request['shareInformation'])?$request['shareInformation']:0);
             $patient_array['sendInformation'] = (isset($request['sendInformation'])?$request['sendInformation']:0);
+            $patient_array['oncologist'] = (isset($request['oncologist'])?$request['oncologist']:'');
             //put address request data into array
             $address_array['address_city']=$request['city'];
             $address_array['address_state']=$request['state'];
@@ -126,7 +128,7 @@ class SurveyCompleteController extends Controller
                 $address = address::create($address_array);
 
                 //place the new address_id into the patient array
-                $patient_array['address_id']=$address[0]['address_id'];
+                $patient_array['address_id']=$address['address_id'];
 
                 //create the patient
                 $patient = patient::create($patient_array);

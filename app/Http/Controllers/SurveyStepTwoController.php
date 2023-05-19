@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\address;
 use App\Models\Patient;
 use Illuminate\Http\Request;
@@ -50,6 +51,9 @@ class SurveyStepTwoController extends Controller
     public function update(Request $request, $id)
     {
        //
+       $token = request();
+       $the_object = Helper::verifyJasonToken($token);
+       
        $request = $request->all();
 
        $patient_array = $request[0]["patient"];
@@ -58,7 +62,8 @@ class SurveyStepTwoController extends Controller
        $address = address::create($address_array);
 
        $patient_array["address_id"] = $address->id;
-       $patient = patient::find($id);
+       //$patient = patient::find($id);
+       $patient = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
        $patient->update($patient_array);
 
        
