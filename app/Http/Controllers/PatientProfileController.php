@@ -49,8 +49,14 @@ class PatientProfileController extends Controller
             $patient_array['ethnicity_id']=$request['ethnicity'];
             $patient_array['education_level']=$request['education_level'];
             $patient_array['is_medicaid_patient']=$request['is_medicaid_patient'];
+<<<<<<< HEAD
 
             $patient_array['email']=$the_object->email;
+=======
+            $patient_array['email'] = $the_object->email;
+            $patient_array['sub'] = $the_object->sub;
+            // $patient_array['email']=(isset($request['email'])?$request['email']:"");
+>>>>>>> 288f5c808dcd37af5b33c554afe6e875962c746a
             $patient_array['sendInformation']=(isset($request['sendInformation'])?$request['sendInformation']:'false');
 
             //$patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);

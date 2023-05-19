@@ -94,10 +94,15 @@ class SurveyCompleteController extends Controller
             $patient_array['education_level']=$request['education_level'];
             $patient_array['is_medicaid_patient']=$request['is_medicaid_patient'];
             $patient_array['email'] = $the_object->email;
+<<<<<<< HEAD
+=======
+            $patient_array['sub'] = $the_object->sub;
+>>>>>>> 288f5c808dcd37af5b33c554afe6e875962c746a
             $patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);
             $patient_array['termsAgreement'] = (isset($request['termsAgreement'])?$request['termsAgreement']:0);
             $patient_array['shareInformation'] = (isset($request['shareInformation'])?$request['shareInformation']:0);
             $patient_array['sendInformation'] = (isset($request['sendInformation'])?$request['sendInformation']:0);
+            $patient_array['oncologist'] = (isset($request['oncologist'])?$request['oncologist']:'');
             //put address request data into array
             $address_array['address_city']=$request['city'];
             $address_array['address_state']=$request['state'];
@@ -126,7 +131,7 @@ class SurveyCompleteController extends Controller
                 $address = address::create($address_array);
 
                 //place the new address_id into the patient array
-                $patient_array['address_id']=$address[0]['address_id'];
+                $patient_array['address_id']=$address['address_id'];
 
                 //create the patient
                 $patient = patient::create($patient_array);

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
+use App\Models\Patient;
 use App\Models\PatientDiagnosis;
 use App\Models\PatientDiagnosisAdditional;
 use App\Models\PatientDiagnosisTreatment;
@@ -50,7 +52,11 @@ class SurveyStepThreeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $token = request();
+        $the_object = Helper::verifyJasonToken($token);
+
+        $patient = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
+
         $request = $request->all();
         foreach($request as $key => $value)  {
             if ($key == 'additional_id') : $additional_array = $value;
@@ -59,7 +65,7 @@ class SurveyStepThreeController extends Controller
             elseif ($key == 'cancer_stage_id') : $int_cancer_stage = $value;
         endif;
         }
-        $patientdiagnosis_array = ['patient_id'=>$id,'cancer_type_id'=>$int_cancer_type,'stage_id'=>$int_cancer_stage];
+        $patientdiagnosis_array = ['patient_id'=>$patient[0]['patient_id'],'cancer_type_id'=>$int_cancer_type,'stage_id'=>$int_cancer_stage];
 
         $PatientDiagnosis = PatientDiagnosis::create($patientdiagnosis_array);
         $PatientDiagnosisId = $PatientDiagnosis->diagnosis_id;

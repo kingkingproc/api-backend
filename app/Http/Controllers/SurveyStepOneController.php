@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\SurveyStepOne;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,13 @@ class SurveyStepOneController extends Controller
      */
     public function store(Request $request)
     {
+        $token = request();
+        $the_object = Helper::verifyJasonToken($token);
+
         $request = $request->all();
+        $request['patient']['sub'] = $the_object->sub;
+        $request['patient']['email'] = $the_object->email;
+        //return $request['patient'];
         return json_encode(['patient'=>surveystepone::create($request['patient'])]);
         
     }

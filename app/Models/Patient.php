@@ -31,7 +31,8 @@ class Patient extends Model
         'sendInformation',
         'education_level',
         'is_medicaid_patient',
-        'view_at'
+        'view_at',
+        'oncologist'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
