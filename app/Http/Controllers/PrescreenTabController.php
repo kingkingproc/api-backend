@@ -16,7 +16,7 @@ class PrescreenTabController extends Controller
 
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
         
         $prescreenResults = DB::connection('pgsql')->select("
@@ -99,7 +99,7 @@ class PrescreenTabController extends Controller
     {
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
                 $deleted = DB::connection('pgsql')->delete("
                 delete from prescreen_response 

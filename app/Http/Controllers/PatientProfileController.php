@@ -42,7 +42,7 @@ class PatientProfileController extends Controller
         $request = request();
         $the_object = self::verifyJasonToken($request);
             // Get the patient record for the sub
-            $patientRecord = patient::where('sub',$the_object->sub)->get();
+            $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
             // put patient request data into array
             $patient_array = $request->only(['user_type', 'name_first', 'name_last', 'name_middle', 'dob_month', 'dob_day', 'dob_year', 'sex']);
@@ -50,7 +50,7 @@ class PatientProfileController extends Controller
             $patient_array['education_level']=$request['education_level'];
             $patient_array['is_medicaid_patient']=$request['is_medicaid_patient'];
 
-            $patient_array['email']=(isset($request['email'])?$request['email']:"");
+            $patient_array['email']=$the_object->email;
             $patient_array['sendInformation']=(isset($request['sendInformation'])?$request['sendInformation']:'false');
 
             //$patient_array['is_complete'] = (isset($request['is_complete'])?$request['is_complete']:0);

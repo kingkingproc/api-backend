@@ -46,7 +46,7 @@ class PatientProfileDiagnosisController extends Controller
         $request = request();
         $the_object = self::verifyJasonToken($request);
             // Get the patient record for the sub
-            $patientRecord = patient::where('sub',$the_object->sub)->get();
+            $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
 
             //put diagnosis request data into array
             //$diagnosis_array['tumor_site_id']=$request['tumor_site'];

@@ -19,7 +19,7 @@ class PrescreenController extends Controller
 
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
 
         $testResults = DB::connection('pgsql')->select("
@@ -76,7 +76,7 @@ class PrescreenController extends Controller
     {
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
         $prescreenRecord = DB::connection('pgsql')->select("
         select * from prescreen_trial_ref where prescreen_trial_ref.trial_id = '" . $request["trial_id"] . "'

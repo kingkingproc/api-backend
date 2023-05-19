@@ -46,7 +46,7 @@ class NewTrialController extends Controller
 
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
         $biomarkerRecord =  DB::connection('pgsql')->select("
         select lb.biomarker_label from lkup_patient_diagnosis_biomarkers lb
@@ -80,7 +80,7 @@ class NewTrialController extends Controller
 
         
         //$prescreenTrialList = Helper::getPrescreenTrialList();
-        $prescreenTrialList = Helper::patientPrescreenStatus($patientRecord[0]['patient_id']);
+        $prescreenTrialList = Helper::patientPrescreenStatus($patientRecord[0]['patient_id'],$string_tableName);
         //return $prescreenTrialList;
 
         $searchTerm = $cancerTypeRecord[0]['cancer_type_label'];

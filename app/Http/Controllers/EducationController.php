@@ -21,7 +21,7 @@ class EducationController extends Controller
 
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         $diagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
         //set for default values
         $searchType = 212;

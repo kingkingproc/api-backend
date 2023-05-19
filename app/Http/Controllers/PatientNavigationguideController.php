@@ -17,7 +17,7 @@ class PatientNavigationguideController extends Controller
     {
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         $navigationRecord = PatientNavigationguide::where('patient_id', $patientRecord[0]['patient_id'])->get();
         
         return $navigationRecord;
@@ -29,7 +29,7 @@ class PatientNavigationguideController extends Controller
         //
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         $navigationRecord = PatientNavigationguide::where('patient_id', $patientRecord[0]['patient_id'])->get();
         
 

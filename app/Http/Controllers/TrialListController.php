@@ -42,7 +42,7 @@ class TrialListController extends Controller
 
         $request = request();
         $the_object = Helper::verifyJasonToken($request);
-        $patientRecord = patient::where('sub',$the_object->sub)->get();
+        $patientRecord = patient::where('sub',$the_object->sub)->where('email', $the_object->email)->get();
         $patientDiagnosisRecord = patientdiagnosis::where('patient_id', $patientRecord[0]['patient_id'])->get();
         $patientBiomarkerRecord =  DB::connection('pgsql')->select("
         select lb.biomarker_synonyms from lkup_patient_diagnosis_biomarkers lb

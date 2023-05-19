@@ -34,8 +34,8 @@ class OncoC4SurveyCompleteController extends Controller
             $patientRecord = patient::where('email',$request['email'])->get();
             if (!empty($request['sub'])) {
                 if (count($patientRecord)) {
-                    $patient_array['user_type']=1; 
-                    $patient_array['sub']=(isset($request['sub'])?$request['sub']:"");
+                    $patient_array['user_type']=10; 
+                    $patient_array['sub']=$request['sub'];
                     $patient_array['patient_id']=$patientRecord[0]['patient_id'];
                     $patient = patient::find($patientRecord[0]['patient_id']);
                     $patient->update($patient_array);
@@ -49,8 +49,6 @@ class OncoC4SurveyCompleteController extends Controller
             $patient_array['user_type']=(isset($request['user_type'])?$request['user_type']:10);
             $patient_array['name_first']=(isset($request['name_first'])?$request['name_first']:"");
             $patient_array['name_last']=(isset($request['name_last'])?$request['name_last']:"");
-            $patient_array['sub']=(isset($request['sub'])?$request['sub']:"");
-            $patient_array['email']=(isset($request['email'])?$request['email']:"");
             $patient_array['name_middle']=(isset($request['name_middle'])?$request['name_middle']:"");
             $patient_array['sex']=(isset($request['sex'])?$request['sex']:"");
             $patient_array['ethnicity_id']=(isset($request['ethnicity'])?$request['ethnicity']:0);
@@ -111,6 +109,8 @@ class OncoC4SurveyCompleteController extends Controller
 
                 //place the new address_id into the patient array
                 $patient_array['address_id']=$address['address_id'];
+                $patient_array['sub']=$request['sub'];
+                $patient_array['email']=$request['email'];
 
                 //create the patient
                 $patient = patient::create($patient_array);
